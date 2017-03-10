@@ -104,6 +104,9 @@
         <input type="submit" class="btn btn-success" value="{% trans "Undelete" %}" />
     </form>
 {% endif %}
+{% if tempcreds %}
+    {% include "credtemp_list.html" %}
+{% endif %}
 {% if not delete %}
     {% if credlogs %}
         {% include "credaudit_list.html" with type='user' %}

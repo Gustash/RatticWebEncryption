@@ -21,10 +21,6 @@ import os
 from django_auth_ldap.config import LDAPSearch
 from datetime import timedelta
 from django.utils.translation import ugettext_lazy as _
-import mimetypes
-
-mimetypes.add_type("image/svg+xml", ".svg", True)
-mimetypes.add_type("image/svg+xml", ".svgz", True)
 
 config = RawConfigParser()
 config.readfp(open('conf/defaults.cfg'))

@@ -9,7 +9,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
 from django.utils import timezone
 
-from models import Cred, CredAudit, Tag, CredChangeQ, CredTemp
+from models import Cred, CredAudit, Tag, CredChangeQ, CredTemp, State
 from search import cred_search
 from forms import ExportForm, CredForm, TagForm
 from exporters import export_keepass
@@ -79,9 +79,6 @@ def download(request, cfilter="special", value="all"):
 
 @login_required
 def list(request, cfilter='special', value='all', sortdir='ascending', sort='title', page=1):
-
-    #logger = logging.getLogger(__name__)
-    #logger.info(CredTemp.objects.get(user=request.user).cred.password)
 
     # Setup basic stuff
     viewdict = {
@@ -188,6 +185,10 @@ def list(request, cfilter='special', value='all', sortdir='ascending', sort='tit
     # Get variables to give the template
     viewdict['credlist'] = cred
 
+    for cred in cred:
+        if CredTemp.temp_access_exists(cred, request.user):
+            cred.is_temp = True
+
     # Create the form for exporting
     viewdict['exportform'] = ExportForm()
 
@@ -215,9 +216,11 @@ def detail(request, cred_id):
     if request.user.is_staff:
         credlogs = cred.logs.all()[:5]
         morelink = reverse('staff.views.audit', args=('cred', cred.id))
+        temp_creds = CredTemp.objects.filter(cred=cred)
     else:
         credlogs = None
         morelink = None
+        temp_creds = None
 
     # User is not in the password owner group, show a read-only UI
     if cred.group in request.user.groups.all():
@@ -231,8 +234,14 @@ def detail(request, cred_id):
     cipher = AESCipher(mesh)
     cred.password = cipher.decrypt(cred.password)
 
+    state = dict()
+    for s in State:
+        state[s.name] = s.value
+
     return render(request, 'cred_detail.html', {
         'cred': cred,
+        'state': state,
+        'tempcreds': temp_creds,
         'credlogs': credlogs,
         'morelink': morelink,
         'readonly': readonly,
@@ -301,7 +310,6 @@ def ssh_key_fingerprint(request, cred_id):
 def add(request):
     if request.method == 'POST':
         form = CredForm(request.user, request.POST['group'], request.POST, request.FILES)
-	logger.info("Add Cred Post: " + str(request.POST))
         if form.is_valid():
             form.save()
             CredAudit(audittype=CredAudit.CREDADD, cred=form.instance, user=request.user).save()
@@ -492,3 +500,29 @@ def bulktagcred(request):
 
     redirect = request.POST.get('next', reverse('cred.views.list'))
     return HttpResponseRedirect(redirect)
+
+@login_required
+def bulkrevoke(request, cred_id):
+    logger.info(request.POST)
+    torevoke = CredTemp.objects.filter(id__in=request.POST.getlist('credcheck'))
+    for c in torevoke:
+        if c.state == State.PENDING.value or c.state == State.GRANTED.value:
+            c.state = State.REFUSED.value
+            c.date_expired = timezone.now()
+            c.save()
+    redirect = request.POST.get('next', reverse('cred.views.detail', kwargs={'cred_id': cred_id}))
+    return HttpResponseRedirect(redirect)
+
+@login_required
+def bulkgrant(request, cred_id):
+    logger.info(request.POST)
+    torevoke = CredTemp.objects.filter(id__in=request.POST.getlist('credcheck'))
+    for c in torevoke:
+        if c.state != State.GRANTED.value:
+            c.state = State.GRANTED.value
+            c.date_granted = timezone.now()
+            c.date_expired = timezone.now() + timezone.timedelta(days=1)
+            c.save()
+    redirect = request.POST.get('next', reverse('cred.views.detail', kwargs={'cred_id': cred_id}))
+    return HttpResponseRedirect(redirect)
+

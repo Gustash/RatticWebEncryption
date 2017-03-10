@@ -28,6 +28,8 @@ urlpatterns = patterns('cred.views',
     url(r'^delete/bulk/$', 'bulkdelete'),
     url(r'^undelete/bulk/$', 'bulkundelete'),
     url(r'^addtag/bulk/$', 'bulktagcred'),
+    url(r'^revoke/bulk/(?P<cred_id>\d+)/$', 'bulkrevoke'),
+    url(r'^grant/bulk/(?P<cred_id>\d+)/$', 'bulkgrant'),
 
     # Tags
     url(r'^tag/$', 'tags'),

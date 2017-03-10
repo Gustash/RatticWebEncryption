@@ -13,6 +13,10 @@ import sys
 from datetime import datetime, timedelta
 from django.utils import timezone
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class ExportForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(
         attrs={'class': 'btn-password-visibility'}
@@ -52,19 +56,22 @@ class CredForm(ModelForm):
 	    self.initial['password'] = encryptor.decrypt(self.instance.password)
 
     def clean_password(self):
-	if (self.instance.id is None):
-	    created_date = timezone.now()
-	    # Save the current date in the object instance
-	    self.instance.created = created_date
-	else:
-	    created_date = self.instance.created
-	# Get the date the Group was created at
-	group_date = Group.objects.filter(id=self.group_id)[0].created
-	# Use a mesh of the date the cred is created and the date the group was created as a key
-	mesh = AESCipher.mesh(str(created_date), str(group_date))
-	password = self.cleaned_data['password']
-	encryptor = AESCipher(mesh)
-	return encryptor.encrypt(password)
+        if self.group_id:
+	    if (self.instance.id is None):
+	        created_date = timezone.now()
+	        # Save the current date in the object instance
+      	        self.instance.created = created_date
+	    else:
+	        created_date = self.instance.created
+	    # Get the date the Group was created at
+	    group_date = Group.objects.filter(id=self.group_id)[0].created
+	    # Use a mesh of the date the cred is created and the date the group was created as a key
+	    mesh = AESCipher.mesh(str(created_date), str(group_date))
+	    password = self.cleaned_data['password']
+	    encryptor = AESCipher(mesh)
+	    return encryptor.encrypt(password)
+        else:
+            return self.cleaned_data['password']
 
     def save(self, *args, **kwargs):
         # Get the filename from the file object

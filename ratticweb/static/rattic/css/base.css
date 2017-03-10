@@ -146,3 +146,10 @@ body {
 }
 
 
+.temporary {
+    background-color: #f4e842;
+}
+
+.table-striped > tbody > tr:nth-child(odd).temporary > td {
+    background-color: #f4e842;
+}

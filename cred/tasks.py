@@ -7,7 +7,6 @@ from django.template import Context
 from django.template.loader import render_to_string
 from django.conf import settings
 
-
 @app.task
 def change_queue_emails():
     # Get everything on the Change Queue

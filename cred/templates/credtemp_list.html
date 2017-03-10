@@ -40,7 +40,7 @@
 		<td><a href={% url "staff.views.userdetail" tempcred.user.id  %}>{{ tempcred.user.username }}</a></td>
                 <td>{{ tempcred.id }}</td>
                 <td>{% if tempcred.date_granted != None %}{{ tempcred.date_granted  }}{% endif %}</td>
-                <td>{{ tempcred.date_expired }}</td>
+                <td>{% if tempcred.date_granted != None %}{{ tempcred.date_expired }}{% endif %}</td>
 		{% if tempcred.state == state.PENDING %}
 		    <td style="background-color:#FFFF00;">
 			{% trans "Pending" %}

@@ -506,8 +506,12 @@ def bulkrevoke(request, cred_id):
     logger.info(request.POST)
     torevoke = CredTemp.objects.filter(id__in=request.POST.getlist('credcheck'))
     for c in torevoke:
-        if c.state == State.PENDING.value or c.state == State.GRANTED.value:
+        if c.state == State.PENDING.value:
             c.state = State.REFUSED.value
+            c.date_expired = None
+            c.save()
+        elif c.state == State.GRANTED.value:
+            c.state = State.EXPIRED.value
             c.date_expired = timezone.now()
             c.save()
     redirect = request.POST.get('next', reverse('cred.views.detail', kwargs={'cred_id': cred_id}))

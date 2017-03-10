@@ -290,10 +290,11 @@ class CredTemp(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(CredTemp, self).__init__(*args, **kwargs)
-        if self.date_expired:
-            if self.date_expired < timezone.now():
-                self.state = State.EXPIRED.value
-                self.save()
+        if self.state != State.REFUSED.value:
+            if self.date_expired:
+                if self.date_expired < timezone.now():
+                    self.state = State.EXPIRED.value
+                    self.save()
 
     @staticmethod
     def temp_access_exists(cred, user):

@@ -39,8 +39,8 @@
 		<td class="credcheck"><input type="checkbox" name="credcheck" value="{{ tempcred.id }}" class="list-checktarget cred-list-check" /></td>
 		<td><a href={% url "staff.views.userdetail" tempcred.user.id  %}>{{ tempcred.user.username }}</a></td>
                 <td>{{ tempcred.id }}</td>
-                <td>{% if tempcred.date_granted != None %}{{ tempcred.date_granted  }}{% endif %}</td>
-                <td>{% if tempcred.date_granted != None %}{{ tempcred.date_expired }}{% endif %}</td>
+                <td>{% if tempcred.date_granted %}{{ tempcred.date_granted  }}{% endif %}</td>
+                <td>{% if tempcred.date_expired %}{{ tempcred.date_expired }}{% endif %}</td>
 		{% if tempcred.state == state.PENDING %}
 		    <td style="background-color:#FFFF00;">
 			{% trans "Pending" %}

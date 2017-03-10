@@ -1,0 +1,35 @@
+Metadata-Version: 1.1
+Name: keepassdb
+Version: 0.2.1
+Summary: Python library for reading and writing KeePass 1.x databases.
+Home-page: http://github.com/hozn/keepassdb
+Author: Hans Lellelid
+Author-email: hans@xmpl.org
+License: GPLv3
+Description: 
+        keepassdb is a Python library that provides functionality for reading and writing
+        KeePass 1.x (and KeePassX) password databases.
+        
+        This library brings together work by multiple authors, including:
+         - Karsten-Kai König <kkoenig@posteo.de>
+         - Brett Viren <brett.viren@gmail.com>
+         - Wakayama Shirou <shirou.faw@gmail.com>
+        
+        Changes in 0.2.1
+        ----------------
+        * Added zip_safe=False as workaround for 2to3/distribute bug.
+        
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.0
+Classifier: Programming Language :: Python :: 3.1
+Classifier: Programming Language :: Python :: 3.2
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Topic :: Security :: Cryptography
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

@@ -1,0 +1,15 @@
+include README CHANGES LICENSE
+recursive-include docs *.rst *.py Makefile
+prune docs/build
+recursive-include django_otp/__pycache__ *
+recursive-include django_otp/templates/otp/admin14 *
+recursive-include django_otp/templates/otp/admin15 *
+recursive-include django_otp/templates/otp/admin16 *
+recursive-include django_otp/plugins/__pycache__ *
+recursive-include django_otp/plugins/otp_static/__pycache__ *
+recursive-include django_otp/plugins/otp_static/management/__pycache__ *
+recursive-include django_otp/plugins/otp_email/__pycache__ *
+recursive-include django_otp/plugins/otp_email/templates/otp/email *
+recursive-include django_otp/plugins/otp_totp/__pycache__ *
+recursive-include django_otp/plugins/otp_totp/migrations/__pycache__ *
+recursive-include django_otp/plugins/otp_hotp/__pycache__ *

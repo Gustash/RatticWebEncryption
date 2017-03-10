@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<form id="RequestCheckSubmitForm" action="" method="post">{% csrf_token  %}
+<input type='hidden' name='next' value=''>
+<table class="table table-striped table-bordered table-condensed table-responsive-fourth-column table-responsive-fifth-column">
+    <thead>
+	<tr>
+	    <td colspan="4">
+		<a class="btn" href="{% url "request.views.add" %}">{% trans "New Request" %}</a>
+		<button class="btn disabled rattic-check-enabled rattic-form-submit" data-target=".cred-list-check" data-action="{% url "request.views.bulkcancel" %}" >Cancel</button>
+		<button class="btn disabled rattic-check-enabled rattic-form-submit" data-target=".cred-list-check" data-action="{% url "request.views.bulkretry" %}">Retry</button>
+	    </td>
+	</tr>
+	<tr>
+ 	    <th>
+		<input type="checkbox" name="all" value="" class="rattic-checkall" data-target=".list-checktarget" />
+	    </th>
+	    <th>
+		<a>Title</a>
+	    </th>
+	    <th>
+		<a>User</a>
+	    </th>
+	    <th>
+		<a>State</a>
+	    </th>
+	</tr>
+    </thead>
+    <tbody>
+	{% for c in data %}
+	    <tr>
+		<td class="credcheck"><input type="checkbox" name="credcheck" value="{{ c.cred_temp.id }}" class="list-checktarget cred-list-check" /></td>
+		<td><a href="{% url "request.views.detail" c.cred_temp.id %}" >{{ c.cred.title  }}</a></td>
+		<td>{{ c.cred.username  }}</td>
+		{% if c.cred_temp.state == 0 %}
+		    <td style="background-color:#FFFF00;">
+			Pending
+		    </td>
+		{% elif c.cred_temp.state == 1 %}
+		    <td style="background-color:#00FF00;">
+			Granted
+		    </td>
+		{% elif c.cred_temp.state == 2 %}
+		    <td style="background-color:#FF0000;">
+			Refused
+		    </td>
+		{% elif c.cred_temp.state == 3 %}
+		    <td style="background-color:#FF0000;">
+			Expired
+		    </td>
+		{% endif %}
+	    </tr>
+	{% endfor %}
+    </tbody>
+</table>
+
+</form>
+
+{% endblock %}

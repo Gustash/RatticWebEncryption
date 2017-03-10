@@ -16,8 +16,12 @@ class DataCred:
 
 @login_required
 def index(request):
-	temp_creds = CredTemp.objects.filter(user=request.user) 
+        if not request.user.is_staff:
+	    temp_creds = CredTemp.objects.filter(user=request.user) 
+        else:
+            temp_creds = CredTemp.objects.all()
         request_creds = Cred.objects.filter(id__in=temp_creds.values_list('cred_id', flat=True))
+            
 	data_cred = []
 
 	for ct in temp_creds:

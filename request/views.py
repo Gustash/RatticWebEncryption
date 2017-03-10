@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from cred.models import CredTemp, Cred, State
 from forms import CredTempForm
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 import logging
@@ -48,7 +49,7 @@ def add(request):
 
 @login_required
 def bulkcancel(request):
-	tocancel = CredTemp.objects.filter(id__in=request.POST.getlist('credcheck')).exclude(state__gt=0)
+	tocancel = CredTemp.objects.filter(id__in=request.POST.getlist('credcheck')).exclude(Q(state__gt=State.PENDING.value) & Q(state__gt=State.GRANTED.value))
 	for ct in tocancel:
 		ct.state = State.EXPIRED.value
 		ct.date_expired = timezone.now()
@@ -60,7 +61,7 @@ def bulkcancel(request):
 def bulkretry(request):
 	toretry = CredTemp.objects.filter(id__in=request.POST.getlist('credcheck'))
 	for ct in toretry:
-		if ct.state != State.PENDING.value:
+		if ct.state != State.PENDING.value and ct.state != State.GRANTED.value:
 			ct.state = State.PENDING.value
 			ct.date_expired = None
 			ct.save()

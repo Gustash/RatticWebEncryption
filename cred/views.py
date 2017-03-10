@@ -14,6 +14,7 @@ from search import cred_search
 from forms import ExportForm, CredForm, TagForm
 from exporters import export_keepass
 from cred.icon import get_icon_list
+from request import views
 
 from django.contrib.auth.models import Group
 
@@ -502,7 +503,7 @@ def bulktagcred(request):
     return HttpResponseRedirect(redirect)
 
 @login_required
-def bulkrevoke(request, cred_id):
+def bulkrevoke(request, cred_id=None):
     logger.info(request.POST)
     torevoke = CredTemp.objects.filter(id__in=request.POST.getlist('credcheck'))
     for c in torevoke:
@@ -514,11 +515,14 @@ def bulkrevoke(request, cred_id):
             c.state = State.EXPIRED.value
             c.date_expired = timezone.now()
             c.save()
-    redirect = request.POST.get('next', reverse('cred.views.detail', kwargs={'cred_id': cred_id}))
+    if cred_id:
+        redirect = request.POST.get('next', reverse('cred.views.detail', kwargs={'cred_id': cred_id}))
+    else:
+        redirect = '/request/list'
     return HttpResponseRedirect(redirect)
 
 @login_required
-def bulkgrant(request, cred_id):
+def bulkgrant(request, cred_id=None):
     logger.info(request.POST)
     torevoke = CredTemp.objects.filter(id__in=request.POST.getlist('credcheck'))
     for c in torevoke:
@@ -527,6 +531,9 @@ def bulkgrant(request, cred_id):
             c.date_granted = timezone.now()
             c.date_expired = timezone.now() + timezone.timedelta(days=1)
             c.save()
-    redirect = request.POST.get('next', reverse('cred.views.detail', kwargs={'cred_id': cred_id}))
+    if cred_id:
+        redirect = request.POST.get('next', reverse('cred.views.detail', kwargs={'cred_id': cred_id}))
+    else:
+        redirect = '/request/list'
     return HttpResponseRedirect(redirect)
 

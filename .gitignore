@@ -1,0 +1,14 @@
+db/ratticdb
+*.pyc
+*.swp
+.coverage
+.idea
+build/rpm/out/*
+conf/local.cfg
+.vagrant
+vagrant_ansible_inventory_rattic
+static/*
+docs/ansible/creds/*
+celerybeat-schedule
+django.mo
+.ropeproject

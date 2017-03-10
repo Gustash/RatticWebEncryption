@@ -1,0 +1,106 @@
+v0.2.7 - April 26, 2014 - Fix for Custom user models with South
+---------------------------------------------------------------
+
+- Updated the otp_totp South migrations to support custom user models. Thanks to
+  https://bitbucket.org/robirichter.
+
+
+v0.2.6 - April 18, 2014 - Fix for Python 3.2 with South
+-------------------------------------------------------
+
+- Removed South-generated unicode string literals.
+
+
+v0.2.4 - April 15, 2014 - TOTP plugin fix (migration warning)
+-------------------------------------------------------------
+
+- Per the RFC, :class:`~django_otp.plugins.otp_totp.models.TOTPDevice` will no
+  longer verify the same token twice.
+
+- Cosmetic fixes to the admin login form on Django 1.6.
+
+.. warning::
+
+    This includes a model change in TOTPDevice. If you are upgrading and your
+    project uses South, you should first convert it to South with ``manage
+    migrate otp_totp 0001 --fake``. If you're not using South, you will need to
+    generate and run the appropriate SQL manually.
+
+
+v0.2.3 - March 3, 2014 - Fix pickling
+-------------------------------------
+
+- OTPMiddleware no longer interferes with pickling request.user.
+
+
+v0.2.2 - December 31, 2013 - Require Django 1.4.2
+-------------------------------------------------
+
+- Update Django requirement to 1.4.2, the first version with django.utils.six.
+
+
+v0.2.1 - November 19, 2013 - Bug fix
+------------------------------------
+
+- Fix unicode representation of devices in some exotic scenarios.
+
+
+v0.2.0 - November 10, 2013 - Django 1.6
+---------------------------------------
+
+- Now supports Django 1.4 to 1.6 on Python 2.6, 2.7, 3.2, and 3.3. This is the
+  first release for Python 3.
+
+
+v0.1.8 - August 20, 2013 - user_has_device API
+-----------------------------------------------
+
+- Add :func:`django_otp.user_has_device` to detect whether a user has any
+  devices configured. This change supports a fix in django-otp-agents 0.1.4.
+
+
+v0.1.7 - July 3, 2013 - Decorator improvement
+-----------------------------------------------
+
+- Add if_configured argument to :func:`~django_otp.decorators.otp_required`.
+
+
+v0.1.6 - May 9, 2013 - Unit test improvements
+---------------------------------------------
+
+- Major unit test cleanup. Tests should pass or be skipped under all supported
+  versions of Django, with or without custom users and timzeone support.
+
+
+v0.1.5 - May 8, 2013 - OTPAdminSite improvement
+-----------------------------------------------
+
+- OTPAdminSite now selects an apporpriate login template automatically, based on
+  the current Django version. Django versions 1.3 to 1.5 are currently
+  supported.
+
+- Unit test cleanup.
+
+
+v0.1.3 - March 10, 2013 - Django 1.5 compatibility
+--------------------------------------------------
+
+- Add support for custom user models in Django 1.5.
+
+- Stop using ``Device.objects``: Django doesn't allow access to an abstract
+  model's manager any more.
+
+
+v0.1.2 - October 8, 2012 - Bug fix
+----------------------------------
+
+- Fix an exception when an empty login form is submitted.
+
+
+v0.1.0 - August 20, 2012 - Initial Release
+------------------------------------------
+
+Initial release.
+
+
+.. vim: ft=rst nospell tw=80

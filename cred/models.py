@@ -7,6 +7,7 @@ from django.forms.models import model_to_dict
 from django.utils.timezone import now
 from django.conf import settings
 from django.utils import timezone
+from django.http import Http404
 
 from ratticweb.util import DictDiffer, field_file_compare
 from ssh_key import SSHKey
@@ -279,7 +280,41 @@ admin.site.register(Cred, CredAdmin)
 admin.site.register(Tag)
 admin.site.register(CredChangeQ, CredChangeQAdmin)
 
+class CredTempManager(models.Manager):
+    def search(self, user, cfilter='special', value='all', sortdir='descending', sort='created'):
+        if not user.is_staff:
+            cred_temp_list = CredTemp.objects.filter(user=user)
+        else:
+            cred_temp_list = CredTemp.objects.all()
+        search_object = None
+        
+        # Standard search, substring in title
+        if cfilter == 'search':
+            cred_temp_list = cred_list.filter(title__icontains=value)
+            search_object = value
+
+        # View all
+        elif cfilter == 'special' and value == 'all':
+            pass  # Do nothing, list is already all accessible passwords
+
+        # Otherwise, search is invalid. Rasie 404
+        else:
+	    raise Http404
+
+        # Sorting rules
+        if sortdir == 'ascending' and sort in CredTemp.SORTABLES:
+            cred_temp_list = cred_temp_list.order_by(sort)
+        elif sortdir == 'descending' and sort in CredTemp.SORTABLES:
+            cred_temp_list = cred_temp_list.order_by('-' + sort)
+        else:
+            raise Http404
+
+        return cred_temp_list
+
 class CredTemp(models.Model):
+    SORTABLES = ('created')
+    objects = CredTempManager()
+
     cred = models.ForeignKey(Cred, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)

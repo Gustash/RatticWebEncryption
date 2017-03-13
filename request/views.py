@@ -17,7 +17,7 @@ class DataCred:
 		self.cred_temp = cred_temp
 
 @login_required
-def index(request, cfilter='special', value='all', sortdir='ascending', sort='title', page=1):
+def index(request, cfilter='special', value='all', sortdir='descending', sort='created', page=1):
 	viewdict = {
         	'title': _('All requests'),
         	'alerts': [],
@@ -29,10 +29,15 @@ def index(request, cfilter='special', value='all', sortdir='ascending', sort='ti
         	'groups': request.user.groups,
         }
 
-        if not request.user.is_staff:
-	    temp_creds = CredTemp.objects.filter(user=request.user) 
-        else:
-            temp_creds = CredTemp.objects.all()
+        temp_creds = CredTemp.objects.search(request.user, cfilter, value, sortdir, sort)
+
+	# Apply the sorting rules
+	if sortdir == 'ascending':
+        	viewdict['revsortdir'] = 'descending'
+    	elif sortdir == 'descending':
+        	viewdict['revsortdir'] = 'ascending'
+    	else:
+		raise Http404
 
 	# Get the page
 	paginator = Paginator(temp_creds, request.user.profile.items_per_page)

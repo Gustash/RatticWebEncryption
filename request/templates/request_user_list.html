@@ -37,7 +37,7 @@
 		<td><a href="{% url "request.views.detail" c.id %}" >{{ c.cred.title  }}</a></td>
 		<td>{{ c.cred.username  }}</td>
                 <td>{{ c.created }}</td>
-		{% if c..state == 0 %}
+		{% if c.state == 0 %}
 		    <td style="background-color:#FFFF00;">
 			Pending
 		    </td>

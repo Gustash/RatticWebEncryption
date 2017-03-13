@@ -40,7 +40,7 @@
 		<select name="tag" class="rattic-single-tag-selector rattic-check-enabled" data-target=".cred-list-check" placeholder="{% trans "Apply a Tag" %}" data-action="{% url "cred.views.bulktagcred" %}" tabindex="-1"></select>
         {% endif %}
         {% if buttons.export and EXPORT_ENABLED %}
-          <button class="btn" href="#exportmodal" data-toggle="modal">{% trans "Download Keepass" %}</button>
+          <!-- <button class="btn" href="#exportmodal" data-toggle="modal">{% trans "Download Keepass" %}</button> -->
         {% endif %}
       </td>
     </tr>

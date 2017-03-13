@@ -16,20 +16,39 @@
 		<input type="checkbox" name="all" value="" class="rattic-checkall" data-target=".list-checktarget" />
 	    </th>
 	    <th>
-		<a>Title</a>
+                {% if sort == 'title' %}
+                    <a href="{% url 'request.views.index' filter value revsortdir 'title' page %}">{% trans "Title" %} {% if sortdir == 'ascending' %}<i class='icon-chevron-up'></i>{% else %}<i class='icon-chevron-down'></i>{% endif %}</a>
+                {% else %}
+                    <a href="{% url 'request.views.index' filter value sortdir 'title' page %}">{% trans "Title" %}</a>
+                {% endif %}
 	    </th>
 	    <th>
-		<a>User</a>
+                {% if sort == 'user' %}
+                    <a href="{% url 'request.views.index' filter value revsortdir 'user' page %}">{% trans "User" %} {% if sortdir == 'ascending' %}<i class='icon-chevron-up'></i>{% else %}<i class='icon-chevron-down'></i>{% endif %}</a>
+                {% else %}
+                    <a href="{% url 'request.views.index' filter value sortdir 'user' page %}">{% trans "User" %}</a>
+                {% endif %}
 	    </th>
             <th>
-                <a>Requested by</a>
+                {% if sort == 'requestedby' %}
+                    <a href="{% url 'request.views.index' filter value revsortdir 'requestedby' page %}">{% trans "Requested by" %} {% if sortdir == 'ascending' %}<i class='icon-chevron-up'></i>{% else %}<i class='icon-chevron-down'></i>{% endif %}</a>
+                {% else %}
+                    <a href="{% url 'request.views.index' filter value sortdir 'requestedby' page %}">{% trans "Requested by" %}</a>
+                {% endif %}
             </th>
 	    <th>
-		<a>Date Requested</a>
+                {% if sort == 'created' %}
+                    <a href="{% url 'request.views.index' filter value revsortdir 'created' page %}">{% trans "Date Requested" %} {% if sortdir == 'ascending' %}<i class='icon-chevron-up'></i>{% else %}<i class='icon-chevron-down'></i>{% endif %}</a>
+                {% else %}
+                    <a href="{% url 'request.views.index' filter value sortdir 'created' page %}">{% trans "Date Requested" %}</a>
+                {% endif %}
 	    </th>
-
 	    <th>
-		<a>State</a>
+		{% if sort == 'state' %}
+                    <a href="{% url 'request.views.index' filter value revsortdir 'state' page %}">{% trans "State" %} {% if sortdir == 'ascending' %}<i class='icon-chevron-up'></i>{% else %}<i class='icon-chevron-down'></i>{% endif %}</a>
+                {% else %}
+                    <a href="{% url 'request.views.index' filter value sortdir 'state' page %}">{% trans "State" %}</a>
+                {% endif %}
 	    </th>
 	</tr>
     </thead>

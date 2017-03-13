@@ -29,7 +29,7 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
         	'groups': request.user.groups,
         }
 
-        temp_creds = CredTemp.objects.search(request.user, cfilter, value, sortdir, sort)
+        temp_creds = CredTemp.objects.search(request.user, cfilter=cfilter, value=value, sortdir=sortdir, sort=sort)
 
 	# Apply the sorting rules
 	if sortdir == 'ascending':

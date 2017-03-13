@@ -2,6 +2,7 @@ from django.forms import ModelForm, SelectMultiple, ModelMultipleChoiceField
 from cred.models import CredTemp, Group, Cred
 from django.db.models import Q
 from cred.models import State
+from django import forms
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,6 +20,12 @@ class CredTempForm(ModelForm):
                 
 		#self.fields['cred'].queryset = Cred.objects.filter(Q(state!=0) & Q(latest=None) & Q(is_deleted=False))
 		self.fields['cred'].queryset = available_creds
+
+        def clean_description(self):
+        	description = self.cleaned_data.get('description')
+		if description.isspace():
+                	raise forms.ValidationError('Description must not be blank')
+		return description
 
 	class Meta:
 		model = CredTemp

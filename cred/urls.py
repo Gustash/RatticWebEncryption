@@ -8,6 +8,11 @@ urlpatterns = patterns('cred.views',
     url(r'^list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/$', 'list'),
     url(r'^list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/page-(?P<page>\d+)/$', 'list'),
 
+    # Detail views
+    url(r'^detail-by-(?P<cfilter>\w+)/(?P<cred_id>\d+)/(?P<value>[^/]*)/$', 'detail'),
+    url(r'^detail-by-(?P<cfilter>\w+)/(?P<cred_id>\d+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/$', 'detail'),
+    url(r'^detail-by-(?P<cfilter>\w+)/(?P<cred_id>\d+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/page-(?P<page>\d+)/$', 'detail'),
+
     # Search dialog for mobile
     url(r'^search/$', 'search'),
 

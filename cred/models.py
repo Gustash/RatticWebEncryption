@@ -281,12 +281,15 @@ admin.site.register(Tag)
 admin.site.register(CredChangeQ, CredChangeQAdmin)
 
 class CredTempManager(models.Manager):
-    def search(self, user, cfilter='special', value='all', sortdir='descending', sort='created'):
+    def search(self, user, cred=None, cfilter='special', value='all', sortdir='descending', sort='created'):
         if not user.is_staff:
             cred_temp_list = CredTemp.objects.filter(user=user)
         else:
             cred_temp_list = CredTemp.objects.all()
         search_object = None
+
+        if cred:
+            cred_temp_list = cred_temp_list.filter(cred=cred)
         
         # Standard search, substring in title
         if cfilter == 'search':
@@ -307,6 +310,8 @@ class CredTempManager(models.Manager):
             sort_query = 'cred__group'
         elif sort == 'user':
             sort_query = 'cred__username'
+        elif sort == 'requestedby':
+            sort_query = 'user__username'
         else:
             sort_query = sort
 
@@ -324,7 +329,7 @@ class CredTempManager(models.Manager):
         return cred_temp_list
 
 class CredTemp(models.Model):
-    SORTABLES = ('created', 'title', 'user', 'group', 'state')
+    SORTABLES = ('created', 'title', 'user', 'group', 'state', 'id', 'requestedby', 'date_granted', 'date_expired')
     objects = CredTempManager()
 
     cred = models.ForeignKey(Cred, on_delete=models.CASCADE)

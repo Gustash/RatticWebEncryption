@@ -305,24 +305,28 @@ class CredTempManager(models.Manager):
 	    raise Http404
 
         if sort == 'title':
-            sort_query = 'cred__title'
+            sort_query = 'cred_cred.title'
+            #sort_query = 'cred__title'
         elif sort == 'group':
-            sort_query = 'cred__group'
+            sort_query = 'cred_cred.group'
+            #sort_query = 'cred__group'
         elif sort == 'user':
-            sort_query = 'cred__username'
+            sort_query = 'cred_cred.username'
         elif sort == 'requestedby':
-            sort_query = 'user__username'
+            sort_query = 'auth_user.username'
         else:
-            sort_query = sort
+            sort_query = 'cred_credtemp.'+sort
 
         for cred in cred_temp_list.order_by('cred__title'):
             logger.info(cred.cred.title)
 
         # Sorting rules
         if sortdir == 'ascending' and sort in CredTemp.SORTABLES:
-            cred_temp_list = cred_temp_list.order_by(sort_query)
+            cred_temp_list = cred_temp_list.select_related().extra(select={'val':'lower('+sort_query+')'}).order_by('val')
+            #cred_temp_list = cred_temp_list.order_by(sort_query)
         elif sortdir == 'descending' and sort in CredTemp.SORTABLES:
-            cred_temp_list = cred_temp_list.order_by('-' + sort_query)
+            cred_temp_list = cred_temp_list.select_related().extra(select={'val':'lower('+sort_query+')'}).order_by('-val')
+            #cred_temp_list = cred_temp_list.order_by('-' + sort_query)
         else:
             raise Http404
 

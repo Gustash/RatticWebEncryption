@@ -50,10 +50,6 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
 
         viewdict['data'] = temp_creds
 	
-	viewContext = {
-	'title': 'Request',
-	'data': temp_creds
-	}
 	return render(request, 'request_list.html', viewdict)
 
 @login_required

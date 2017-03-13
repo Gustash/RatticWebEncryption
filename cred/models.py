@@ -300,7 +300,7 @@ class CredTempManager(models.Manager):
         elif cfilter == 'special' and value == 'all':
             pass  # Do nothing, list is already all accessible passwords
 
-        # Otherwise, search is invalid. Rasie 404
+        # Otherwise, search is invalid. Raise 404
         else:
 	    raise Http404
 

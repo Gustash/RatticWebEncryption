@@ -39,6 +39,9 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
     	else:
 		raise Http404
 
+        if cfilter == 'search':
+                viewdict['title'] = _('Requests for search "%(searchstring)s"') % {'searchstring': value, }
+
 	# Get the page
 	paginator = Paginator(temp_creds, request.user.profile.items_per_page)
 	try:

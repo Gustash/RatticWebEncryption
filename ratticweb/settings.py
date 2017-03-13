@@ -317,13 +317,22 @@ BACKUP_RECIPIENTS = confget("backup", "recipients", None)
 
 # [email]
 # SMTP Mail Opts
-EMAIL_BACKEND = config.get('email', 'backend')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_FILE_PATH = config.get('email', 'filepath')
-EMAIL_HOST = config.get('email', 'host')
-EMAIL_PORT = config.get('email', 'port')
-EMAIL_HOST_USER = config.get('email', 'user')
-EMAIL_HOST_PASSWORD = config.get('email', 'password')
-EMAIL_USE_TLS = confgetbool('email', 'usetls', False)
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'testdjango88'
+EMAIL_HOST_PASSWORD = 'django123'
+EMAIL_USE_TLS = True
+
+#DEFAULT_FROM_EMAIL = config.get('email', 'from_email')
+#EMAIL_BACKEND = config.get('email', 'backend')
+#EMAIL_FILE_PATH = config.get('email', 'filepath')
+#EMAIL_HOST = config.get('email', 'host')
+#EMAIL_PORT = config.get('email', 'port')
+#EMAIL_HOST_USER = config.get('email', 'user')
+#EMAIL_HOST_PASSWORD = config.get('email', 'password')
+#EMAIL_USE_TLS = confgetbool('email', 'usetls', False)
 DEFAULT_FROM_EMAIL = config.get('email', 'from_email')
 
 # [scheduler]

@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
+from django.core.mail import send_mail
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,8 +30,10 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
         	'groups': request.user.groups,
         }
 
-        temp_creds = CredTemp.objects.search(request.user, cfilter=cfilter, value=value, sortdir=sortdir, sort=sort)
+	send_mail('Django', 'Hello from Django', 'testdjango@gmail.com', ['vadimz2@hotmail.com'])
 
+        temp_creds = CredTemp.objects.search(request.user, cfilter=cfilter, value=value, sortdir=sortdir, sort=sort)
+	
 	# Apply the sorting rules
 	if sortdir == 'ascending':
         	viewdict['revsortdir'] = 'descending'

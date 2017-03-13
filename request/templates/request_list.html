@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+{% if not user.is_staff %}
+  {% include "request_user_list.html" %}
+{% else %}
+  {% include "request_staff_list.html" %}
+{% endif %}
+
+<div class="pagination pagination-centered">
+  <ul>
+    {% if data.has_previous %}
+      <li><a href="{% url "request.views.index" filter value sortdir sort data.previous_page_number %}">{% trans "Prev" %}</a></li>
+    {% else %}
+      <li class="disabled"><a href="#">{% trans "Prev" %}</a></li>
+    {% endif %}
+    {% for p in data.paginator.page_range %}
+      {% if data.number == p %}
+        <li class="active"><a href="#">{{ p }}</a></li>
+      {% else %}
+        <li><a href="{% url "request.views.index" filter value sortdir sort p %}">{{ p }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if data.has_next %}
+      <li><a href="{% url "request.views.index" filter value sortdir sort data.next_page_number %}">{% trans "Next" %}</a></li>
+    {% else %}
+      <li class="disabled"><a href="#">{% trans "Next" %}</a></li>
+    {%endif %}
+  </ul>
+</div>
+
+{% endblock %}

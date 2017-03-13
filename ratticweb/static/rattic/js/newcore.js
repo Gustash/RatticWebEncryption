@@ -191,9 +191,14 @@ var RATTIC = (function ($, ZeroClipboard) {
 
   function _performCredSearch() {
     var searchstr = $(this).children('input[type=search]').val();
+    var app = window.location.pathname.split("/")[1];
 
     if (searchstr.length > 0) {
-      window.location = my.page.getURLRoot() + "cred/list-by-search/" + searchstr + "/";
+      if (app == "request") {
+        window.location = my.page.getURLRoot() + "request/list-by-search/" + searchstr + "/";
+      } else {
+        window.location = my.page.getURLRoot() + "cred/list-by-search/" + searchstr + "/";
+      }
     }
 
     return false;

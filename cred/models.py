@@ -290,7 +290,7 @@ class CredTempManager(models.Manager):
         
         # Standard search, substring in title
         if cfilter == 'search':
-            cred_temp_list = cred_list.filter(title__icontains=value)
+            cred_temp_list = cred_temp_list.filter(cred__title__icontains=value)
             search_object = value
 
         # View all

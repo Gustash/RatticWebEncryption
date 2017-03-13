@@ -10,7 +10,11 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'CredTemp.created'
         db.add_column(u'cred_credtemp', 'created',
+<<<<<<< HEAD
                       self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2017, 3, 11, 0, 0)),
+=======
+                      self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2017, 3, 10, 0, 0)),
+>>>>>>> 1ac26d048c189528482acd59b9a7a53090789601
                       keep_default=False)
 
 
@@ -95,7 +99,11 @@ class Migration(SchemaMigration):
         },
         u'cred.credtemp': {
             'Meta': {'object_name': 'CredTemp'},
+<<<<<<< HEAD
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2017, 3, 11, 0, 0)'}),
+=======
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2017, 3, 10, 0, 0)'}),
+>>>>>>> 1ac26d048c189528482acd59b9a7a53090789601
             'cred': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['cred.Cred']"}),
             'date_expired': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'date_granted': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),

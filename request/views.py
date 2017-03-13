@@ -33,7 +33,7 @@ def index(request):
 	'title': 'Request',
 	'data': data_cred 
 	}
-	return render(request, 'request.html', viewContext)
+	return render(request, 'request_list.html', viewContext)
 
 @login_required
 def add(request):
@@ -48,7 +48,7 @@ def add(request):
 	else:
 		form = CredTempForm(requser=request.user)
 		logger.info(form.is_valid())
-	return render(request, 'makeRequest.html', {'form': form})
+	return render(request, 'request_edit.html', {'form': form})
 
 @login_required
 def bulkcancel(request):

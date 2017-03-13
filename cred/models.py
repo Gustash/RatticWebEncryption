@@ -286,7 +286,7 @@ class CredTemp(models.Model):
     date_granted = models.DateTimeField(editable=False, null=True)
     date_expired = models.DateTimeField(editable=False, null=True)
     state = models.IntegerField(editable=False, default=State.PENDING.value)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=False)
 
     def __init__(self, *args, **kwargs):
         super(CredTemp, self).__init__(*args, **kwargs)

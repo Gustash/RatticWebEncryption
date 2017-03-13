@@ -36,24 +36,24 @@
     <tbody>
 	{% for c in data %}
 	    <tr>
-		<td class="credcheck"><input type="checkbox" name="credcheck" value="{{ c.cred_temp.id }}" class="list-checktarget cred-list-check" /></td>
-		<td><a href="{% url "request.views.detail" c.cred_temp.id %}" >{{ c.cred.title  }}</a></td>
+		<td class="credcheck"><input type="checkbox" name="credcheck" value="{{ c.id }}" class="list-checktarget cred-list-check" /></td>
+		<td><a href="{% url "request.views.detail" c.id %}" >{{ c.cred.title  }}</a></td>
 		<td>{{ c.cred.username  }}</td>
-                <td><a href="{% url "staff.views.userdetail" c.cred_temp.user_id %}">{{ c.cred_temp.user.username }}</a></td>
-                <td>{{ c.cred_temp.created }}</td>
-		{% if c.cred_temp.state == 0 %}
+                <td><a href="{% url "staff.views.userdetail" c.user_id %}">{{ c.user.username }}</a></td>
+                <td>{{ c.created }}</td>
+		{% if c.state == 0 %}
 		    <td style="background-color:#FFFF00;">
 			Pending
 		    </td>
-		{% elif c.cred_temp.state == 1 %}
+		{% elif c.state == 1 %}
 		    <td style="background-color:#00FF00;">
 			Granted
 		    </td>
-		{% elif c.cred_temp.state == 2 %}
+		{% elif c.state == 2 %}
 		    <td style="background-color:#FF0000;">
 			Refused
 		    </td>
-		{% elif c.cred_temp.state == 3 %}
+		{% elif c.state == 3 %}
 		    <td style="background-color:#FF0000;">
 			Expired
 		    </td>

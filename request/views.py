@@ -5,6 +5,8 @@ from cred.models import CredTemp, Cred, State
 from forms import CredTempForm
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils.translation import ugettext as _
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,25 +17,39 @@ class DataCred:
 		self.cred_temp = cred_temp
 
 @login_required
-def index(request):
+def index(request, cfilter='special', value='all', sortdir='ascending', sort='title', page=1):
+	viewdict = {
+        	'title': _('All requests'),
+        	'alerts': [],
+        	'filter': unicode(cfilter).lower(),
+        	'value': unicode(value).lower(),
+	        'sort': unicode(sort).lower(),
+        	'sortdir': unicode(sortdir).lower(),
+	        'page': unicode(page).lower(),
+        	'groups': request.user.groups,
+        }
+
         if not request.user.is_staff:
 	    temp_creds = CredTemp.objects.filter(user=request.user) 
         else:
             temp_creds = CredTemp.objects.all()
-        request_creds = Cred.objects.filter(id__in=temp_creds.values_list('cred_id', flat=True))
-            
-	data_cred = []
 
-	for ct in temp_creds:
-		for c in request_creds:
-			if ct.cred_id == c.id and not c.is_deleted:
-				data_cred.append(DataCred(c, ct))
+	# Get the page
+	paginator = Paginator(temp_creds, request.user.profile.items_per_page)
+	try:
+		temp_creds = paginator.page(page)
+	except PageNotAnInteger:
+		temp_creds = paginator.page(1)
+	except EmptyPage:
+		temp_creds = paginator.page(paginator.num_pages)
+
+        viewdict['data'] = temp_creds
 	
 	viewContext = {
 	'title': 'Request',
-	'data': data_cred 
+	'data': temp_creds
 	}
-	return render(request, 'request_list.html', viewContext)
+	return render(request, 'request_list.html', viewdict)
 
 @login_required
 def add(request):

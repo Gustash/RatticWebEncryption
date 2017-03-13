@@ -301,18 +301,30 @@ class CredTempManager(models.Manager):
         else:
 	    raise Http404
 
+        if sort == 'title':
+            sort_query = 'cred__title'
+        elif sort == 'group':
+            sort_query = 'cred__group'
+        elif sort == 'user':
+            sort_query = 'cred__username'
+        else:
+            sort_query = sort
+
+        for cred in cred_temp_list.order_by('cred__title'):
+            logger.info(cred.cred.title)
+
         # Sorting rules
         if sortdir == 'ascending' and sort in CredTemp.SORTABLES:
-            cred_temp_list = cred_temp_list.order_by(sort)
+            cred_temp_list = cred_temp_list.order_by(sort_query)
         elif sortdir == 'descending' and sort in CredTemp.SORTABLES:
-            cred_temp_list = cred_temp_list.order_by('-' + sort)
+            cred_temp_list = cred_temp_list.order_by('-' + sort_query)
         else:
             raise Http404
 
         return cred_temp_list
 
 class CredTemp(models.Model):
-    SORTABLES = ('created')
+    SORTABLES = ('created', 'title', 'user', 'group', 'state')
     objects = CredTempManager()
 
     cred = models.ForeignKey(Cred, on_delete=models.CASCADE)

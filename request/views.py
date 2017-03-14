@@ -129,32 +129,41 @@ def read_mail():
 	mail.login('testdjango88@gmail.com', 'django123')
 	mail.select("INBOX")
 
-	retcode, messages = mail.search(None, '(UNSEEN)')
+	retcode, messages = mail.search(None, 'ALL')
 	if retcode == 'OK':
-		logger.info(messages)
 		for message in messages[0].split(' '):
 			if message != '':
-				logger.info("Message: " + message)
 				result, data = mail.fetch(message, '(BODY[HEADER.FIELDS (IN-REPLY-TO)])')
-				in_reply_to_raw = data[0][1]
-				in_reply_to = re.search(r"\<([A-Za-z0-9_]+)\>", in_reply_to_raw)
-				logger.info("In reply to: " + in_reply_to)
-
-
-#				parser = HeaderParser()
-#				header = parser.parsestr(header_data)
-#				logger.info("Keys: " + header.keys())
-
-	result, data = mail.uid('search', None, '(HEADER In-Reply-To "CACZnBmM61U__OjTy0MBY6UuSHKu09DpHZu+RUjxEQa9WgoGxOw@mail.gmail.com")')
-	logger.info("Email UUID: " + str(data[0].split()[-1]))
-	result, data = mail.uid('fetch', data[0].split()[-1], '(RFC822)')
-	email_message = email.message_from_string(data[0][1])
-	logger.info("Payload: " + str(email_message.get_payload(0)))
+				in_reply_to = parse_in_reply_to(data)
+				if in_reply_to:
+					result, data = mail.uid('search', None, '(HEADER In-Reply-To "' + in_reply_to  + '")')
+					result, data = mail.uid('fetch', data[0].split()[-1], '(RFC822)')
+					email_message = email.message_from_string(data[0][1])
+					body = email_message.get_payload(0).get_payload().split("\n")[0].strip()
+					if body.lower() == 'yes':
+						mail.select("[Gmail]/Correio enviado")
+						result, data = mail.uid('search', None, '(HEADER Message-ID "' + in_reply_to  + '")')
+						if data[0]:
+							result, data = mail.uid('fetch', data[0].split()[-1], '(RFC822)')
+							email_message = email.message_from_string(data[0][1])
+							body = email_message.get_payload(0).get_payload().split("\n")
+							for line in body:
+								if line.startswith('Request ID:'):
+									request_id = line.replace('Request ID:', '').strip()
+                                                        		logger.info("Request ID: " + request_id)
+							mail.select("INBOX")
+					elif body.lower() == 'no':
+						logger.info('This is a no')
 
 	logger.info("No more emails...")
 
-def parse_email(string):
-	raw_email = b"\n".join(string)
-	parsed_email = email.message_from_string(raw_email)
-	return parsed_email
-
+def parse_in_reply_to(data):
+	if data:
+		if data[0]:
+			if data[0][1]:
+				in_reply_to_raw = data[0][1]
+				start = str(data[0][1]).find('<') + 1
+				end = str(data[0][1]).find('>')
+				parsed_reply_to = str(data[0][1])[start:end].strip()
+				return parsed_reply_to
+	return None

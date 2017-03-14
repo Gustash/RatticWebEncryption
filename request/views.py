@@ -8,6 +8,8 @@ from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
+from email import parser
+import poplib
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,6 +31,8 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
 	        'page': unicode(page).lower(),
         	'groups': request.user.groups,
         }
+
+	read_mail()
 
         temp_creds = CredTemp.objects.search(request.user, cfilter=cfilter, value=value, sortdir=sortdir, sort=sort)
 	
@@ -114,3 +118,20 @@ def detail(request, cred_temp_id):
 	}
 
 	return render(request, 'request_detail.html', viewContext)
+
+def read_mail():
+	pop_conn = poplib.POP3_SSL('pop.gmail.com')
+	pop_conn.user('testdjango88')
+	pop_conn.pass_('django123')
+	
+	numMessages = len(pop_conn.list()[1])
+	for i in range(numMessages):
+		logger.info("Reading mail...")
+		for j in pop_conn.retr(i + 1)[1]:
+			if j == 'YES':
+				logger.info('Message Received: YES')
+			elif j == 'NO':
+				logger.info('Message Received: NO')
+	pop_conn.quit()
+
+	logger.info("No more emails...")

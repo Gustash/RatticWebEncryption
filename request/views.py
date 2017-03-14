@@ -30,8 +30,6 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
         	'groups': request.user.groups,
         }
 
-	send_mail('Django', 'Hello from Django', 'testdjango@gmail.com', ['vadimz2@hotmail.com'])
-
         temp_creds = CredTemp.objects.search(request.user, cfilter=cfilter, value=value, sortdir=sortdir, sort=sort)
 	
 	# Apply the sorting rules
@@ -66,8 +64,11 @@ def add(request):
 		form = CredTempForm(request.user, request.POST, instance=cred_temp)
 		if form.is_valid():
                         if not CredTemp.objects.filter(user=request.user, cred=request.POST.get('cred')):
- 			    form.save()
-			    return HttpResponseRedirect(reverse('request.views.index'))
+ 			   form.save()
+			   subject = 'Password requested by ' + str(request.user)
+		    	   message = 'New request made by \'' + str(request.user) + '\' to access \'' + str(Cred.objects.get(id=cred_temp.cred_id)) + '\'\nDescription: ' + str(cred_temp.description)
+			   send_mail(subject, message, 'testdjango@gmail.com', ['vadimz2@hotmail.com'])
+			   return HttpResponseRedirect(reverse('request.views.index'))
 	else:
 		form = CredTempForm(requser=request.user)
 		logger.info(form.is_valid())
@@ -91,6 +92,11 @@ def bulkretry(request):
 			ct.state = State.PENDING.value
 			ct.date_expired = None
 			ct.save()
+ 	subject = 'Password requested by ' + str(request.user)
+	message = 'New request made by \'' + str(request.user) + '\' to access \'' + str(Cred.objects.get(id=ct.cred_id)) + '\'\nDescription: ' + str(ct.description)
+	send_mail(subject, message, 'testdjango@gmail.com', ['vadimz2@hotmail.com'])
+
+
 		
 
 	return HttpResponseRedirect(reverse('request.views.index'))

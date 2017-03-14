@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
-from email import parser
+import email
 import poplib
 import logging
 
@@ -130,11 +130,22 @@ def read_mail():
 	numMessages = len(pop_conn.list()[1])
 	for i in range(numMessages):
 		logger.info("Reading mail...")
-		for j in pop_conn.retr(i + 1)[1]:
+		message = pop_conn.retr(i + 1)[1]
+		for j in message:
 			if j == 'YES':
-				logger.info('Message Received: YES')
+				parsed_email = parse_email(message)
+				logger.info('Yes Received: ' + parsed_email['In-Reply-To'])
+				break
 			elif j == 'NO':
-				logger.info('Message Received: NO')
+				parsed_email = parse_email(message)
+				logger.info('No Received: ' + parsed_email['In-Reply-To'])
+				break
 	pop_conn.quit()
 
 	logger.info("No more emails...")
+
+def parse_email(string):
+	raw_email = b"\n".join(string)
+	parsed_email = email.message_from_string(raw_email)
+	return parsed_email
+

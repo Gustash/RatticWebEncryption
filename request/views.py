@@ -10,7 +10,9 @@ from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
 import email
 import poplib
+import imaplib
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -123,24 +125,31 @@ def detail(request, cred_temp_id):
 	return render(request, 'request_detail.html', viewContext)
 
 def read_mail():
-	pop_conn = poplib.POP3_SSL('pop.gmail.com')
-	pop_conn.user('testdjango88')
-	pop_conn.pass_('django123')
-	
-	numMessages = len(pop_conn.list()[1])
-	for i in range(numMessages):
-		logger.info("Reading mail...")
-		message = pop_conn.retr(i + 1)[1]
-		for j in message:
-			if j == 'YES':
-				parsed_email = parse_email(message)
-				logger.info('Yes Received: ' + parsed_email['In-Reply-To'])
-				break
-			elif j == 'NO':
-				parsed_email = parse_email(message)
-				logger.info('No Received: ' + parsed_email['In-Reply-To'])
-				break
-	pop_conn.quit()
+	mail = imaplib.IMAP4_SSL('imap.gmail.com')
+	mail.login('testdjango88@gmail.com', 'django123')
+	mail.select("INBOX")
+
+	retcode, messages = mail.search(None, '(UNSEEN)')
+	if retcode == 'OK':
+		logger.info(messages)
+		for message in messages[0].split(' '):
+			if message != '':
+				logger.info("Message: " + message)
+				result, data = mail.fetch(message, '(BODY[HEADER.FIELDS (IN-REPLY-TO)])')
+				in_reply_to_raw = data[0][1]
+				in_reply_to = re.search(r"\<([A-Za-z0-9_]+)\>", in_reply_to_raw)
+				logger.info("In reply to: " + in_reply_to)
+
+
+#				parser = HeaderParser()
+#				header = parser.parsestr(header_data)
+#				logger.info("Keys: " + header.keys())
+
+	result, data = mail.uid('search', None, '(HEADER In-Reply-To "CACZnBmM61U__OjTy0MBY6UuSHKu09DpHZu+RUjxEQa9WgoGxOw@mail.gmail.com")')
+	logger.info("Email UUID: " + str(data[0].split()[-1]))
+	result, data = mail.uid('fetch', data[0].split()[-1], '(RFC822)')
+	email_message = email.message_from_string(data[0][1])
+	logger.info("Payload: " + str(email_message.get_payload(0)))
 
 	logger.info("No more emails...")
 

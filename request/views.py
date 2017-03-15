@@ -14,6 +14,8 @@ import poplib
 import imaplib
 import logging
 import re
+import subprocess
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +36,8 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
 	        'page': unicode(page).lower(),
         	'groups': request.user.groups,
         }
-
-	mail_manager.update()
-
-	#read_mail()
-	#try_mailing()
+	
+	#mail_manager.update()
 
         temp_creds = CredTemp.objects.search(request.user, cfilter=cfilter, value=value, sortdir=sortdir, sort=sort)
 	

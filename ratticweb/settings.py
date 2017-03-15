@@ -26,7 +26,6 @@ config = RawConfigParser()
 config.readfp(open('conf/defaults.cfg'))
 CONFIGURED_BY = config.read(['conf/local.cfg', '/etc/ratticweb.cfg'])
 
-
 def confget(section, var, default):
     try:
         return config.get(section, var)

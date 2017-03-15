@@ -6,6 +6,11 @@ from django.core.mail import send_mail
 from django.template import Context
 from django.template.loader import render_to_string
 from django.conf import settings
+from request.Mailing import mail_manager
+
+@app.task
+def check_mails():
+	mail_manager.update()
 
 @app.task
 def change_queue_emails():

@@ -15,10 +15,7 @@ from fields import SizedFileField
 from storage import CredAttachmentStorage
 from enum import Enum
 import sys
-import logging
 import json
-
-logger = logging.getLogger(__name__)
 
 class Tag(models.Model):
     name = models.CharField(max_length=64, unique=True)
@@ -316,9 +313,6 @@ class CredTempManager(models.Manager):
             sort_query = 'auth_user.username'
         else:
             sort_query = 'cred_credtemp.'+sort
-
-        for cred in cred_temp_list.order_by('cred__title'):
-            logger.info(cred.cred.title)
 
         # Sorting rules
         if sortdir == 'ascending' and sort in CredTemp.SORTABLES:

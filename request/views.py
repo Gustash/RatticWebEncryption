@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
+from Mailing import mail_manager
 import email
 import poplib
 import imaplib
@@ -34,7 +35,10 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
         	'groups': request.user.groups,
         }
 
-	read_mail()
+	mail_manager.update()
+
+	#read_mail()
+	#try_mailing()
 
         temp_creds = CredTemp.objects.search(request.user, cfilter=cfilter, value=value, sortdir=sortdir, sort=sort)
 	
@@ -64,20 +68,16 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
 
 @login_required
 def add(request):
-	logger.info(request.method)
 	if request.method == "POST":
 		cred_temp = CredTemp(user=request.user)
 		form = CredTempForm(request.user, request.POST, instance=cred_temp)
 		if form.is_valid():
                         if not CredTemp.objects.filter(user=request.user, cred=request.POST.get('cred')):
  			   form.save()
-			   subject = 'Password requested by ' + str(request.user)
-		    	   message = 'New request made by \'' + str(request.user) + '\' to access \'' + str(Cred.objects.get(id=cred_temp.cred_id)) + '\'\nDescription: ' + str(cred_temp.description)
-			   send_mail(subject, message, 'testdjango@gmail.com', ['vadimz2@hotmail.com'])
+			   send_cred_mail(str(request.user), str(Cred.objects.get(id=cred_temp.cred_id)), str(cred_temp.id), cred_temp.description)
 			   return HttpResponseRedirect(reverse('request.views.index'))
 	else:
 		form = CredTempForm(requser=request.user)
-		logger.info(form.is_valid())
 	return render(request, 'request_edit.html', {'form': form})
 
 @login_required
@@ -98,12 +98,7 @@ def bulkretry(request):
 			ct.state = State.PENDING.value
 			ct.date_expired = None
 			ct.save()
- 	subject = 'Password requested by ' + str(request.user)
-	message = 'New request made by \'' + str(request.user) + '\' to access \'' + str(Cred.objects.get(id=ct.cred_id)) + '\'\nDescription: ' + str(ct.description)
-	send_mail(subject, message, 'testdjango@gmail.com', ['vadimz2@hotmail.com'])
-
-
-		
+		send_cred_mail(str(request.user), str(Cred.objects.get(id=ct.cred_id)), str(ct.id), ct.description)
 
 	return HttpResponseRedirect(reverse('request.views.index'))
 
@@ -115,8 +110,6 @@ def detail(request, cred_temp_id):
 	else:
 		link = None
 
-	logger.info(cred_temp.description)
-
 	viewContext = {
 		'data': cred_temp,
 		'link': link
@@ -124,46 +117,7 @@ def detail(request, cred_temp_id):
 
 	return render(request, 'request_detail.html', viewContext)
 
-def read_mail():
-	mail = imaplib.IMAP4_SSL('imap.gmail.com')
-	mail.login('testdjango88@gmail.com', 'django123')
-	mail.select("INBOX")
-
-	retcode, messages = mail.search(None, 'ALL')
-	if retcode == 'OK':
-		for message in messages[0].split(' '):
-			if message != '':
-				result, data = mail.fetch(message, '(BODY[HEADER.FIELDS (IN-REPLY-TO)])')
-				in_reply_to = parse_in_reply_to(data)
-				if in_reply_to:
-					result, data = mail.uid('search', None, '(HEADER In-Reply-To "' + in_reply_to  + '")')
-					result, data = mail.uid('fetch', data[0].split()[-1], '(RFC822)')
-					email_message = email.message_from_string(data[0][1])
-					body = email_message.get_payload(0).get_payload().split("\n")[0].strip()
-					if body.lower() == 'yes':
-						mail.select("[Gmail]/Correio enviado")
-						result, data = mail.uid('search', None, '(HEADER Message-ID "' + in_reply_to  + '")')
-						if data[0]:
-							result, data = mail.uid('fetch', data[0].split()[-1], '(RFC822)')
-							email_message = email.message_from_string(data[0][1])
-							body = email_message.get_payload(0).get_payload().split("\n")
-							for line in body:
-								if line.startswith('Request ID:'):
-									request_id = line.replace('Request ID:', '').strip()
-                                                        		logger.info("Request ID: " + request_id)
-							mail.select("INBOX")
-					elif body.lower() == 'no':
-						logger.info('This is a no')
-
-	logger.info("No more emails...")
-
-def parse_in_reply_to(data):
-	if data:
-		if data[0]:
-			if data[0][1]:
-				in_reply_to_raw = data[0][1]
-				start = str(data[0][1]).find('<') + 1
-				end = str(data[0][1]).find('>')
-				parsed_reply_to = str(data[0][1])[start:end].strip()
-				return parsed_reply_to
-	return None
+def send_cred_mail(user, cred, cred_id, description):
+	subject = 'Password requested by ' + user
+	message = 'New request made by \'' + user + '\' to acces \'' + cred + '\'\n\nPassword: ' + cred + '\nPT_ID: ' + cred_id + '\nUser: ' + user + '\n\nDescription:\n' + description
+	send_mail(subject, message, 'testdjango@gmail.com', ['vadimz2@hotmail.com'])

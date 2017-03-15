@@ -4,10 +4,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from models import Cred, CredChangeQ, Tag
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 # TODO: Move this to a ModelManager
 def cred_search(user, cfilter='special', value='all', sortdir='ascending', sort='title', groups=[]):
     cred_list = Cred.objects.visible(user)
@@ -66,8 +62,6 @@ def cred_search(user, cfilter='special', value='all', sortdir='ascending', sort=
     # Otherwise, search is invalid. Rasie 404
     else:
         raise Http404
-
-    logger.info('Sorting for: ' + sort)
 
     if sort == 'group':
         sort_query = 'auth_group.name'

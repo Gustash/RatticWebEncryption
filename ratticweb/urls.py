@@ -23,7 +23,7 @@ base_urlpatterns = patterns('',
     url(r'^cred/', include('cred.urls')),
     url(r'^staff/', include('staff.urls')),
     url(r'^help/', include('help.urls')),
-    url(r'^request/', include('request.urls')),	
+    url(r'^request/', include('request.urls', app_name="request")),	
 
     # API
     url(r'^api/', include(v1_api.urls)),

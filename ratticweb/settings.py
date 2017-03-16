@@ -85,8 +85,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
+    "django.core.context_processors.request",
     'ratticweb.context_processors.base_template_reqs',
     'ratticweb.context_processors.logo_selector',
+    'request.contexts.appname',
 )
 
 # List of finder classes that know how to find static files in

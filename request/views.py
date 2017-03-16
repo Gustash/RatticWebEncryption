@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from cred.models import CredTemp, Cred, State
 from forms import CredTempForm
@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
+<<<<<<< HEAD
 from django.core.mail import EmailMultiAlternatives 
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -15,9 +16,10 @@ from django.contrib.auth.models import User
 
 import poplib
 import imaplib
+=======
+from django.core.mail import send_mail
+>>>>>>> gustavo
 import logging
-import re
-import sys
 import threading
 
 logger = logging.getLogger(__name__)
@@ -117,6 +119,10 @@ def detail(request, cred_temp_id):
 	}
 
 	return render(request, 'request_detail.html', viewContext)
+
+@login_required
+def search(request):
+	return render(request, 'request_search.html', {})
 
 def send_cred_mail(request, cred_temp):
 	t = threading.Thread(target=send_thread, args=(request, cred_temp))

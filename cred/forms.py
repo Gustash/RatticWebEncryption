@@ -1,7 +1,6 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms import ModelForm, SelectMultiple, Select, PasswordInput
-from django.db import models
 
 import paramiko
 from ssh_key import SSHKey
@@ -9,8 +8,6 @@ from models import Cred, Tag, Group
 from widgets import CredAttachmentInput, CredIconChooser
 
 from cipher import AESCipher
-import sys
-from datetime import datetime, timedelta
 from django.utils import timezone
 
 import logging

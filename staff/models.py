@@ -4,7 +4,7 @@ from django import forms
 from importloaders import keepass
 from keepassdb.exc import AuthenticationError, InvalidDatabase
 from cred.models import CredAudit
-from datetime import datetime
+#from datetime import datetime
 from django.db import models
 
 class AuditFilterForm(forms.Form):
@@ -29,6 +29,11 @@ class UserForm(forms.ModelForm):
         max_length=32,
         min_length=8
     )
+
+    def __init__(self, *args, **kwargs):
+	    super(UserForm, self).__init__(*args, **kwargs)
+
+	    self.fields['email'].required = True
 
     # Define our model
     class Meta:

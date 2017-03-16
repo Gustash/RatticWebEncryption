@@ -12,4 +12,7 @@ urlpatterns = patterns('request.views',
         url(r'^list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/$', 'index', name='index'),
         url(r'^list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/$', 'index', name='index'),
         url(r'^list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/page-(?P<page>\d+)/$', 'index', name='index'),
+
+        # Search dialog for mobile
+        url(r'^search/$', 'search'),
 )

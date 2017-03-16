@@ -14,15 +14,11 @@ from search import cred_search
 from forms import ExportForm, CredForm, TagForm
 from exporters import export_keepass
 from cred.icon import get_icon_list
-from request import views
 
 from django.contrib.auth.models import Group
 
 from cipher import AESCipher
-import sys
-from datetime import datetime
 import logging
-import json
 
 logger = logging.getLogger(__name__)
 

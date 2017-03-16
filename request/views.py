@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from cred.models import CredTemp, Cred, State
 from forms import CredTempForm
@@ -8,11 +8,7 @@ from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
-import poplib
-import imaplib
 import logging
-import re
-import sys
 import threading
 
 logger = logging.getLogger(__name__)

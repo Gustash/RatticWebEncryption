@@ -14,8 +14,6 @@ from ssh_key import SSHKey
 from fields import SizedFileField
 from storage import CredAttachmentStorage
 from enum import Enum
-import sys
-import json
 
 class Tag(models.Model):
     name = models.CharField(max_length=64, unique=True)
@@ -283,7 +281,7 @@ class CredTempManager(models.Manager):
             cred_temp_list = CredTemp.objects.filter(user=user)
         else:
             cred_temp_list = CredTemp.objects.all()
-        search_object = None
+#        search_object = None
 
         if cred:
             cred_temp_list = cred_temp_list.filter(cred=cred)
@@ -291,7 +289,7 @@ class CredTempManager(models.Manager):
         # Standard search, substring in title
         if cfilter == 'search':
             cred_temp_list = cred_temp_list.filter(cred__title__icontains=value)
-            search_object = value
+#            search_object = value
 
         # View all
         elif cfilter == 'special' and value == 'all':

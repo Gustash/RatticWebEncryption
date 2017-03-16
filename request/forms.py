@@ -1,7 +1,6 @@
-from django.forms import ModelForm, Select, ModelMultipleChoiceField
-from cred.models import CredTemp, Group, Cred
+from django.forms import ModelForm, Select
+from cred.models import CredTemp, Cred
 from django.db.models import Q
-from cred.models import State
 from django import forms
 import logging
 

@@ -7,12 +7,18 @@
 {% block content %}
 <h1>{{ data.cred.title }}</h1>
 <table class="table table-striped table-bordered table-condensed">
+{% if user.is_staff %}
+<tr>
+  <th>{% trans "Requested by" %}</th>
+  <td><span id="requestedby"><a href="{% url "staff.views.userdetail" data.user.id %}">{{ data.user.username }}</a></span></td>
+</tr>
+{% endif %}
 <tr>
   <th>{% trans "Username" %}</th>
-  <td><span id="usernam">{{ data.cred.username }}</span></td>
+  <td><span id="username">{{ data.cred.username }}</span></td>
 </tr>
 <tr>
-  <th>{% trans "Password"%}</th>
+  <th>{% trans "Credential"%}</th>
   <td>
     {% if link %}
       <a href="{% url link data.cred.id %}">{{ data.cred.title }}</a>

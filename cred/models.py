@@ -7,6 +7,7 @@ from django.forms.models import model_to_dict
 from django.utils.timezone import now
 from django.conf import settings
 from django.utils import timezone
+from django.http import Http404
 
 from ratticweb.util import DictDiffer, field_file_compare
 from ssh_key import SSHKey
@@ -14,10 +15,7 @@ from fields import SizedFileField
 from storage import CredAttachmentStorage
 from enum import Enum
 import sys
-import logging
 import json
-
-logger = logging.getLogger(__name__)
 
 class Tag(models.Model):
     name = models.CharField(max_length=64, unique=True)
@@ -279,21 +277,74 @@ admin.site.register(Cred, CredAdmin)
 admin.site.register(Tag)
 admin.site.register(CredChangeQ, CredChangeQAdmin)
 
+class CredTempManager(models.Manager):
+    def search(self, user, cred=None, cfilter='special', value='all', sortdir='descending', sort='created'):
+        if not user.is_staff:
+            cred_temp_list = CredTemp.objects.filter(user=user)
+        else:
+            cred_temp_list = CredTemp.objects.all()
+        search_object = None
+
+        if cred:
+            cred_temp_list = cred_temp_list.filter(cred=cred)
+        
+        # Standard search, substring in title
+        if cfilter == 'search':
+            cred_temp_list = cred_temp_list.filter(cred__title__icontains=value)
+            search_object = value
+
+        # View all
+        elif cfilter == 'special' and value == 'all':
+            pass  # Do nothing, list is already all accessible passwords
+
+        # Otherwise, search is invalid. Raise 404
+        else:
+	    raise Http404
+
+        if sort == 'title':
+            sort_query = 'cred_cred.title'
+            #sort_query = 'cred__title'
+        elif sort == 'group':
+            sort_query = 'cred_cred.group'
+            #sort_query = 'cred__group'
+        elif sort == 'user':
+            sort_query = 'cred_cred.username'
+        elif sort == 'requestedby':
+            sort_query = 'auth_user.username'
+        else:
+            sort_query = 'cred_credtemp.'+sort
+
+        # Sorting rules
+        if sortdir == 'ascending' and sort in CredTemp.SORTABLES:
+            cred_temp_list = cred_temp_list.select_related().extra(select={'val':'lower('+sort_query+')'}).order_by('val')
+            #cred_temp_list = cred_temp_list.order_by(sort_query)
+        elif sortdir == 'descending' and sort in CredTemp.SORTABLES:
+            cred_temp_list = cred_temp_list.select_related().extra(select={'val':'lower('+sort_query+')'}).order_by('-val')
+            #cred_temp_list = cred_temp_list.order_by('-' + sort_query)
+        else:
+            raise Http404
+
+        return cred_temp_list
+
 class CredTemp(models.Model):
+    SORTABLES = ('created', 'title', 'user', 'group', 'state', 'id', 'requestedby', 'date_granted', 'date_expired')
+    objects = CredTempManager()
+
     cred = models.ForeignKey(Cred, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     date_granted = models.DateTimeField(editable=False, null=True)
     date_expired = models.DateTimeField(editable=False, null=True)
     state = models.IntegerField(editable=False, default=State.PENDING.value)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=False)
 
     def __init__(self, *args, **kwargs):
         super(CredTemp, self).__init__(*args, **kwargs)
-        if self.date_expired:
-            if self.date_expired < timezone.now():
-                self.state = State.EXPIRED.value
-                self.save()
+        if self.state != State.REFUSED.value:
+            if self.date_expired:
+                if self.date_expired < timezone.now():
+                    self.state = State.EXPIRED.value
+                    self.save()
 
     @staticmethod
     def temp_access_exists(cred, user):

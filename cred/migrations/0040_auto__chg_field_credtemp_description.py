@@ -8,16 +8,14 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'CredTemp.created'
-        db.add_column(u'cred_credtemp', 'created',
-                      self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2017, 3, 11, 0, 0)),
-                      keep_default=False)
 
+        # Changing field 'CredTemp.description'
+        db.alter_column(u'cred_credtemp', 'description', self.gf('django.db.models.fields.TextField')(default='No description'))
 
     def backwards(self, orm):
-        # Deleting field 'CredTemp.created'
-        db.delete_column(u'cred_credtemp', 'created')
 
+        # Changing field 'CredTemp.description'
+        db.alter_column(u'cred_credtemp', 'description', self.gf('django.db.models.fields.TextField')(null=True))
 
     models = {
         u'auth.group': {
@@ -95,11 +93,11 @@ class Migration(SchemaMigration):
         },
         u'cred.credtemp': {
             'Meta': {'object_name': 'CredTemp'},
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2017, 3, 11, 0, 0)'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'cred': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['cred.Cred']"}),
             'date_expired': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'date_granted': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'state': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})

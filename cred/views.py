@@ -14,6 +14,7 @@ from search import cred_search
 from forms import ExportForm, CredForm, TagForm
 from exporters import export_keepass
 from cred.icon import get_icon_list
+from request import views
 
 from django.contrib.auth.models import Group
 
@@ -204,7 +205,7 @@ def tags(request):
 
 
 @login_required
-def detail(request, cred_id):
+def detail(request, cred_id, cfilter='special', value='all', sortdir='descending', sort='created', page=1):
     cred = get_object_or_404(Cred, pk=cred_id)
 
     # Check user has perms as owner or viewer
@@ -216,12 +217,36 @@ def detail(request, cred_id):
     if request.user.is_staff:
         credlogs = cred.logs.all()[:5]
         morelink = reverse('staff.views.audit', args=('cred', cred.id))
-        temp_creds = CredTemp.objects.filter(cred=cred)
+        temp_creds = CredTemp.objects.search(request.user, cred, cfilter, value, sortdir, sort)
+
+        # Apply the sorting rules
+        if sortdir == 'ascending':
+            revsortdir = 'descending'
+        elif sortdir == 'descending':
+            revsortdir = 'ascending'
+        else:
+            raise Http404
+
+        # Get the page
+        paginator = Paginator(temp_creds, request.user.profile.items_per_page)
+        try:
+            temp_creds = paginator.page(page)
+        except PageNotAnInteger:
+            temp_creds = paginator.page(1)
+        except EmptyPage:
+            temp_creds = paginator.page(paginator.num_pages)
+
     else:
         credlogs = None
         morelink = None
         temp_creds = None
-
+        filter = None
+        value = None
+        sort = None
+        sortdir = None
+        page = None
+        revsortdir = None
+        
     # User is not in the password owner group, show a read-only UI
     if cred.group in request.user.groups.all():
         readonly = False
@@ -246,6 +271,12 @@ def detail(request, cred_id):
         'morelink': morelink,
         'readonly': readonly,
         'groups': request.user.groups,
+        'filter': unicode(cfilter).lower(),
+        'value': unicode(value).lower(),
+        'sort': unicode(sort).lower(),
+        'sortdir': unicode(sortdir).lower(),
+        'page': unicode(page).lower(),
+        'revsortdir': unicode(revsortdir).lower(),
     })
 
 
@@ -502,19 +533,26 @@ def bulktagcred(request):
     return HttpResponseRedirect(redirect)
 
 @login_required
-def bulkrevoke(request, cred_id):
+def bulkrevoke(request, cred_id=None):
     logger.info(request.POST)
     torevoke = CredTemp.objects.filter(id__in=request.POST.getlist('credcheck'))
     for c in torevoke:
-        if c.state == State.PENDING.value or c.state == State.GRANTED.value:
+        if c.state == State.PENDING.value:
             c.state = State.REFUSED.value
+            c.date_expired = None
+            c.save()
+        elif c.state == State.GRANTED.value:
+            c.state = State.EXPIRED.value
             c.date_expired = timezone.now()
             c.save()
-    redirect = request.POST.get('next', reverse('cred.views.detail', kwargs={'cred_id': cred_id}))
+    if cred_id:
+        redirect = request.POST.get('next', reverse('cred.views.detail', kwargs={'cred_id': cred_id}))
+    else:
+        redirect = '/request/list'
     return HttpResponseRedirect(redirect)
 
 @login_required
-def bulkgrant(request, cred_id):
+def bulkgrant(request, cred_id=None):
     logger.info(request.POST)
     torevoke = CredTemp.objects.filter(id__in=request.POST.getlist('credcheck'))
     for c in torevoke:
@@ -523,6 +561,9 @@ def bulkgrant(request, cred_id):
             c.date_granted = timezone.now()
             c.date_expired = timezone.now() + timezone.timedelta(days=1)
             c.save()
-    redirect = request.POST.get('next', reverse('cred.views.detail', kwargs={'cred_id': cred_id}))
+    if cred_id:
+        redirect = request.POST.get('next', reverse('cred.views.detail', kwargs={'cred_id': cred_id}))
+    else:
+        redirect = '/request/list'
     return HttpResponseRedirect(redirect)
 

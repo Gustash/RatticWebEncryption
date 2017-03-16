@@ -2,9 +2,7 @@ from django.contrib.auth.models import User, Group
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-
 from models import Cred, CredChangeQ, Tag
-
 
 # TODO: Move this to a ModelManager
 def cred_search(user, cfilter='special', value='all', sortdir='ascending', sort='title', groups=[]):
@@ -48,7 +46,6 @@ def cred_search(user, cfilter='special', value='all', sortdir='ascending', sort=
             groups = Group.objects.all()
 
         cred_list = Cred.objects.change_advice(search_object, groups)
-
     # View all
     elif cfilter == 'special' and value == 'all':
         pass  # Do nothing, list is already all accessible passwords
@@ -66,11 +63,18 @@ def cred_search(user, cfilter='special', value='all', sortdir='ascending', sort=
     else:
         raise Http404
 
+    if sort == 'group':
+        sort_query = 'auth_group.name'
+    else:
+        sort_query = 'cred_cred.' + sort
+
     # Sorting rules
     if sortdir == 'ascending' and sort in Cred.SORTABLES:
-        cred_list = cred_list.order_by('latest', sort)
+	cred_list = cred_list.select_related().extra(select={'val':'lower('+sort_query+')'}).order_by('latest','val')
+        #cred_list = cred_list.order_by('latest', sort)
     elif sortdir == 'descending' and sort in Cred.SORTABLES:
-        cred_list = cred_list.order_by('latest', '-' + sort)
+	cred_list = cred_list.select_related().extra(select={'val':'lower('+sort_query+')'}).order_by('latest','-val')
+        #cred_list = cred_list.order_by('latest', '-' + sort)
     else:
         raise Http404
 

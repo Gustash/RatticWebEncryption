@@ -18,19 +18,40 @@
 		<input type="checkbox" name="all" value="" class="rattic-checkall" data-target=".list-checktarget" />
 	    </th>
 	    <th>
-		<a>{% trans "User" %}</a>
+                {% if sort == 'requestedby' %}
+                    <a href="{% url 'cred.views.detail' filter cred.id value revsortdir 'requestedby' page %}">{% trans "User" %} {% if sortdir == 'ascending' %}<i class='icon-chevron-up'></i>{% else %}<i class='icon-chevron-down'></i>{% endif %}</a>
+                {% else %}
+                    <a href="{% url 'cred.views.detail' filter cred.id value sortdir 'requestedby' page %}">{% trans "User" %}</a>
+                {% endif %}
 	    </th>
             <th>
-                <a>{% trans "Request" %}</a>
+                {% if sort == 'id' %}
+                    <a href="{% url 'cred.views.detail' filter cred.id value revsortdir 'id' page %}">{% trans "Request" %} {% if sortdir == 'ascending' %}<i class='icon-chevron-up'></i>{% else %}<i class='icon-chevron-down'></i>{% endif %}</a>
+                {% else %}
+                    <a href="{% url 'cred.views.detail' filter cred.id value sortdir 'id' page %}">{% trans "Request" %}</a>
+                {% endif %}
             </th>
             <th>
-                <a>{% trans "Access Granted" %}</a>
+                {% if sort == 'date_granted' %}
+                    <a href="{% url 'cred.views.detail' filter cred.id value revsortdir 'date_granted' page %}">{% trans "Access Granted" %} {% if sortdir == 'ascending' %}<i class='icon-chevron-up'></i>{% else %}<i class='icon-chevron-down'></i>{% endif %}</a>
+                {% else %}
+                    <a href="{% url 'cred.views.detail' filter cred.id value sortdir 'date_granted' page %}">{% trans "Access Granted" %}</a>
+                {% endif %}
             </th>
             <th>
-                <a>{% trans "Access Expired" %}</a>
+                {% if sort == 'date_expired' %}
+                    <a href="{% url 'cred.views.detail' filter cred.id value revsortdir 'date_expired' page %}">{% trans "Access Expired" %} {% if sortdir == 'ascending' %}<i class='icon-chevron-up'></i>{% else %}<i class='icon-chevron-down'></i>{% endif %}</a>
+                {% else %}
+                    <a href="{% url 'cred.views.detail' filter cred.id value sortdir 'date_expired' page %}">{% trans "Access Expired" %}</a>
+                {% endif %}
+
             </th>
             <th>
-                <a>{% trans "State" %}</a>
+                {% if sort == 'state' %}
+                    <a href="{% url 'cred.views.detail' filter cred.id value revsortdir 'state' page %}">{% trans "State" %} {% if sortdir == 'ascending' %}<i class='icon-chevron-up'></i>{% else %}<i class='icon-chevron-down'></i>{% endif %}</a>
+                {% else %}
+                    <a href="{% url 'cred.views.detail' filter cred.id value sortdir 'state' page %}">{% trans "State" %}</a>
+                {% endif %}
 	</tr>
     </thead>
     <tbody>
@@ -38,9 +59,9 @@
 	    <tr>
 		<td class="credcheck"><input type="checkbox" name="credcheck" value="{{ tempcred.id }}" class="list-checktarget cred-list-check" /></td>
 		<td><a href={% url "staff.views.userdetail" tempcred.user.id  %}>{{ tempcred.user.username }}</a></td>
-                <td>{{ tempcred.id }}</td>
-                <td>{% if tempcred.date_granted != None %}{{ tempcred.date_granted  }}{% endif %}</td>
-                <td>{{ tempcred.date_expired }}</td>
+                <td><a href={% url "request.views.detail" tempcred.id %}>{{ tempcred.id }}</a></td>
+                <td>{% if tempcred.date_granted %}{{ tempcred.date_granted  }}{% endif %}</td>
+                <td>{% if tempcred.date_expired %}{{ tempcred.date_expired }}{% endif %}</td>
 		{% if tempcred.state == state.PENDING %}
 		    <td style="background-color:#FFFF00;">
 			{% trans "Pending" %}
@@ -64,3 +85,25 @@
 </table>
 
 </form>
+
+<div class="pagination pagination-centered">
+  <ul>
+    {% if tempcreds.has_previous %}
+      <li><a href="{% url "cred.views.detail" filter cred.id value sortdir sort tempcreds.previous_page_number %}">{% trans "Prev" %}</a></li>
+    {% else %}
+      <li class="disabled"><a href="#">{% trans "Prev" %}</a></li>
+    {% endif %}
+    {% for p in tempcreds.paginator.page_range %}
+      {% if tempcreds.number == p %}
+        <li class="active"><a href="#">{{ p }}</a></li>
+      {% else %}
+        <li><a href="{% url "cred.views.detail" filter cred.id value sortdir sort p %}">{{ p }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if tempcreds.has_next %}
+      <li><a href="{% url "cred.views.detail" filter cred.id value sortdir sort tempcreds.next_page_number %}">{% trans "Next" %}</a></li>
+    {% else %}
+      <li class="disabled"><a href="#">{% trans "Next" %}</a></li>
+    {%endif %}
+  </ul>
+</div>

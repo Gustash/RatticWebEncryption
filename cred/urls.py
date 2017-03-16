@@ -8,6 +8,11 @@ urlpatterns = patterns('cred.views',
     url(r'^list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/$', 'list'),
     url(r'^list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/page-(?P<page>\d+)/$', 'list'),
 
+    # Detail views
+    url(r'^detail-by-(?P<cfilter>\w+)/(?P<cred_id>\d+)/(?P<value>[^/]*)/$', 'detail'),
+    url(r'^detail-by-(?P<cfilter>\w+)/(?P<cred_id>\d+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/$', 'detail'),
+    url(r'^detail-by-(?P<cfilter>\w+)/(?P<cred_id>\d+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/page-(?P<page>\d+)/$', 'detail'),
+
     # Search dialog for mobile
     url(r'^search/$', 'search'),
 
@@ -28,7 +33,9 @@ urlpatterns = patterns('cred.views',
     url(r'^delete/bulk/$', 'bulkdelete'),
     url(r'^undelete/bulk/$', 'bulkundelete'),
     url(r'^addtag/bulk/$', 'bulktagcred'),
+    url(r'^revoke/bulk/$', 'bulkrevoke'),
     url(r'^revoke/bulk/(?P<cred_id>\d+)/$', 'bulkrevoke'),
+    url(r'^grant/bulk/$', 'bulkgrant'),
     url(r'^grant/bulk/(?P<cred_id>\d+)/$', 'bulkgrant'),
 
     # Tags

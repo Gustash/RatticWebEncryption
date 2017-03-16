@@ -93,6 +93,7 @@ class Message:
                                                         	return body.lower()
                                                 	else:
                                                         	return email_message.get_payload()
+		return ''
 
 
 	def get_body(self):

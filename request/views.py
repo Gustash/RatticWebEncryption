@@ -8,14 +8,12 @@ from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
-from Mailing import mail_manager
-import email
 import poplib
 import imaplib
 import logging
 import re
-import subprocess
 import sys
+import threading
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +35,6 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
         	'groups': request.user.groups,
         }
 	
-	#mail_manager.update()
-
         temp_creds = CredTemp.objects.search(request.user, cfilter=cfilter, value=value, sortdir=sortdir, sort=sort)
 	
 	# Apply the sorting rules
@@ -117,6 +113,10 @@ def detail(request, cred_temp_id):
 	return render(request, 'request_detail.html', viewContext)
 
 def send_cred_mail(user, cred, cred_id, description):
+	t = threading.Thread(target=send_thread, args=(user, cred, cred_id, description))
+	t.start()
+
+def send_thread(user, cred, cred_id, description):
 	subject = 'Password requested by ' + user
 	message = 'New request made by \'' + user + '\' to acces \'' + cred + '\'\n\nPassword: ' + cred + '\nPT_ID: ' + cred_id + '\nUser: ' + user + '\n\nDescription:\n' + description
 	send_mail(subject, message, 'testdjango@gmail.com', ['vadimz2@hotmail.com'])

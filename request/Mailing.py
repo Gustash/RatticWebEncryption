@@ -95,7 +95,6 @@ class Message:
                                                         	return email_message.get_payload()
 		return ''
 
-
 	def get_body(self):
 		mail = imaplib.IMAP4_SSL(IMAP_SERVER)
 		mail.login(IMAP_USER, IMAP_PASS)
@@ -114,7 +113,8 @@ class Message:
 							body = email_message.get_payload(0).get_payload().split('\n')[2].strip()
 							return body.lower()
 						else: 
-							return email_message.get_payload()
+							logger.info(email_message.get_payload())
+							return [item.lower() for item in email_message.get_payload()]
 		return ''
 
 	@staticmethod

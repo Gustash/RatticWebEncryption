@@ -92,7 +92,7 @@ class Message:
                                                         	body = email_message.get_payload(0).get_payload().split('\n')[0].strip()
                                                         	return body.lower()
                                                 	else:
-                                                        	return email_message.get_payload()
+								return [item.lower() for item in email_message.get_payload()]
 		return ''
 
 	def get_body(self):

@@ -164,7 +164,7 @@ class mail_manager:
 					if 'yes' in m.get_reply_body():
 						cred_temp.state = State.GRANTED.value
 						cred_temp.date_granted = timezone.now()
-						cred_temp.date_granted = timezone.now() + timezone.timedelta(days=1)
+						cred_temp.date_expired = timezone.now() + timezone.timedelta(days=1)
 					elif 'no' in m.get_reply_body():
 						cred_temp.state = State.REFUSED.value
 					cred_temp.save()

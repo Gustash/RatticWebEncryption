@@ -30,6 +30,11 @@ class UserForm(forms.ModelForm):
         min_length=8
     )
 
+    def __init__(self, *args, **kwargs):
+	    super(UserForm, self).__init__(*args, **kwargs)
+
+	    self.fields['email'].required = True
+
     # Define our model
     class Meta:
         model = User

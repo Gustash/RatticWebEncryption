@@ -159,10 +159,12 @@ class NewUser(FormView):
 
     # Create the user, set password to newpass
     def form_valid(self, form):
-        user = form.save()
-        user.set_password(form.cleaned_data['newpass'])
-        user.save()
-        return super(NewUser, self).form_valid(form)
+	if form.cleaned_data['newpass'] is not None and len(form.cleaned_data['newpass']) > 0:
+            user = form.save()
+            user.set_password(form.cleaned_data['newpass'])
+            user.save()
+            return super(NewUser, self).form_valid(form)
+	return super(NewUser, self).form_invalid(form)
 
 
 class UpdateUser(UpdateView):

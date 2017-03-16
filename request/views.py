@@ -8,7 +8,6 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
-<<<<<<< HEAD
 from django.core.mail import EmailMultiAlternatives 
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -16,9 +15,6 @@ from django.contrib.auth.models import User
 
 import poplib
 import imaplib
-=======
-from django.core.mail import send_mail
->>>>>>> gustavo
 import logging
 import threading
 

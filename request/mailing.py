@@ -1,0 +1,113 @@
+from cred.models import CredTemp, State
+from django.utils import timezone
+import email
+import imaplib
+
+IMAP_SERVER = 'imap.gmail.com'
+IMAP_USER = 'testdjango88@gmail.com'
+IMAP_PASS = 'django123'
+
+class Message:
+	def __init__(self, mail, id):
+		self.mail = mail
+		if self._is_reply(id):
+			self._get_answer(id)
+			self._get_reply()
+
+	def _is_reply(self, id):
+		# If the header has reply-id, save id and return True
+		# Else, return False
+		result, data = self.mail.uid('search', None, '(BODY[HEADER.FIELDS (IN-REPLY-TO)])')
+		if data[0]:
+			if data[0][1]:
+				self.reply_message_id = self._get_message_code(data[0][1])
+				return True
+		return False
+
+	def _get_message_code(self, raw_id):
+		start = raw_id.find('<') + 1
+		end = raw_id.find('>')
+		return raw_id[start:end]
+
+	def _get_answer(self, id):
+		# Get body of answer
+		# 
+		# If body has 'yes' or 'no'
+		# Set self.answer and return True
+		# Else
+		# return False
+		body = self._get__body(id, True)
+		if 'yes' in body:
+			self.answer = 'yes'
+			return True
+		elif 'no' in body:
+			self.answer = 'no'
+			return True
+		return False
+
+	def _get_body(self, id, is_reply):
+		result, data = self.mail.uid('fetch', id, '(RDC822)')
+		if data[0]:
+			if data[0][1]:
+				email_message = email.message_from_string(data[0][1])
+				if email_message.is_multipart():
+					if is_reply:
+						return email_message.get_payload(0).get_payload().split('\n')[0].strip().lower()
+					else:
+						return email_message.get_payload(0).get_payload().split('\n')[2].strip().lower()
+				else:
+					return [item.lower() for item in email_message.get_payload()]
+		return None
+
+	def _get_reply(self, id):
+		# Get body of reply
+		#
+		# If body has request id
+		# Set self.cred_temp_id and return True
+		# Else
+		# return False
+		body = self._get__body(self.reply_message_id, False)
+		if body:
+			for line in body.split('\n'):
+				if 'pt_id' in line:
+					self.cred_temp_id = line[len('pt_id: '):]
+					return True
+		return False
+	
+	def update_cred_temp(self):
+		if self.answer:
+			if self.cred_temp_id:
+				cred_temp = CredTemp.objects.filter(id=self.cred_temp_id)
+				if cred_temp.state != State.PENDING.value:
+					if self.answer == 'yes': 
+						cred_temp.state = State.GRANTED.value
+						cred_temp.date_granted = timezone.now()
+						cred_temp.date_expired = timezone.now() + timezone.timedelta(days=1)
+						cred_temp.save()
+						return True
+					else:
+						cred_temp.state = State.REFUSED.value
+						cred_temp.save()
+						return True
+		return False
+
+class MailManager:
+	@staticmethod
+	def update():
+		# Open mail
+		# Query unread emails
+		# For each unread email, get an instance of message
+			# Update each instance
+		# Close mail
+
+		mail = imaplib.IMAP4_SSL(IMAP_SERVER)
+		mail.login(IMAP_USER, IMAP_PASS)
+
+		mail.select('[Gmail]/Todo o correio')
+
+		retcode, messages = mail.search(None, '(UNSEEN)')
+		if retcode == 'OK':
+			for message in messages:
+				Message(mail, message).update_cred_temp()
+
+		mail.close()

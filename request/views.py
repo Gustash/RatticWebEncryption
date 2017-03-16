@@ -7,7 +7,11 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives 
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.contrib.auth.models import User
+
 import poplib
 import imaplib
 import logging
@@ -63,13 +67,14 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
 
 @login_required
 def add(request):
+	logger.info(reverse('request.views.index'))
 	if request.method == "POST":
 		cred_temp = CredTemp(user=request.user)
 		form = CredTempForm(request.user, request.POST, instance=cred_temp)
 		if form.is_valid():
                         if not CredTemp.objects.filter(user=request.user, cred=request.POST.get('cred')):
  			   form.save()
-			   send_cred_mail(str(request.user), str(Cred.objects.get(id=cred_temp.cred_id)), str(cred_temp.id), cred_temp.description)
+			   send_cred_mail(request, cred_temp)
 			   return HttpResponseRedirect(reverse('request.views.index'))
 	else:
 		form = CredTempForm(requser=request.user)
@@ -93,7 +98,7 @@ def bulkretry(request):
 			ct.state = State.PENDING.value
 			ct.date_expired = None
 			ct.save()
-		send_cred_mail(str(request.user), str(Cred.objects.get(id=ct.cred_id)), str(ct.id), ct.description)
+		send_cred_mail(request, ct)
 
 	return HttpResponseRedirect(reverse('request.views.index'))
 
@@ -112,11 +117,22 @@ def detail(request, cred_temp_id):
 
 	return render(request, 'request_detail.html', viewContext)
 
-def send_cred_mail(user, cred, cred_id, description):
-	t = threading.Thread(target=send_thread, args=(user, cred, cred_id, description))
+def send_cred_mail(request, cred_temp):
+	t = threading.Thread(target=send_thread, args=(request, cred_temp))
 	t.start()
 
-def send_thread(user, cred, cred_id, description):
-	subject = 'Password requested by ' + user
-	message = 'New request made by \'' + user + '\' to acces \'' + cred + '\'\n\nPassword: ' + cred + '\nPT_ID: ' + cred_id + '\nUser: ' + user + '\n\nDescription:\n' + description
-	send_mail(subject, message, 'testdjango@gmail.com', ['vadimz2@hotmail.com'])
+def send_thread(request, cred_temp):
+	users = User.objects.filter(is_staff=True)
+	mails = []
+	for u in users:
+		mails.append(u.email)	
+	subject = 'Password requested by ' + str(request.user)
+	cred_link = "http://" + request.get_host() + reverse('cred.views.detail', kwargs={'cred_id':cred_temp.cred_id}) 
+	cred_temp_link = "http://" + request.get_host() + reverse('request.views.detail', kwargs={'cred_temp_id':cred_temp.id})
+	user_link = "http://" + request.get_host() + reverse('staff.views.userdetail', kwargs={'uid':cred_temp.user_id})
+	html_content = render_to_string('request_mail.html', {'user':str(request.user), 'title':str(cred_temp.cred), 'user_link':user_link,'cred_temp_link':cred_temp_link, 'cred_link':cred_link, 'temp_id':str(cred_temp.id), 'description': cred_temp.description})
+	text_content = strip_tags(html_content)
+
+	msg = EmailMultiAlternatives(subject, text_content, 'testdjango88@gmail.com', mails)
+	msg.attach_alternative(html_content, "text/html")
+	msg.send()

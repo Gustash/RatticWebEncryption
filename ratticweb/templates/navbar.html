@@ -4,6 +4,7 @@
 {% load i18n %}
 {% url "cred.views.list" as cred_views_list %}
 {% url "cred.views.search" as cred_views_search %}
+{% url "request.views.search" as request_views_search %}
 {% url "cred.views.list" "special" "changeq" as cred_views_viewqueue %}
 {% url "staff.views.home" as staff_views_home %}
 {% url "help.views.home" as help_views_home %}
@@ -58,10 +59,10 @@
                   </li>
                 {% endif %}
                 <li>
-                  <a href="{% url "django.contrib.auth.views.logout" %}">{% trans "Logout" %}</a>
+                  <a href="{{ request_home }}">{% trans "Request Privilege" %}</a>
                 </li>
                 <li>
-                  <a href="{{ request_home }}">{% trans "Request Privilege" %}</a>
+                  <a href="{% url "django.contrib.auth.views.logout" %}">{% trans "Logout" %}</a>
                 </li>
               {% else %}
                 <li>
@@ -77,7 +78,11 @@
           </li>
           {% if user.is_authenticated %}
           <li {% if pageurl == cred_views_search %}class="active"{% endif %}>
-            <a href="{{ cred_views_search }}">{% trans "Search" %}</a>
+	    {% if appname == "request" %}
+              <a href="{{ request_views_search }}">{% trans "Search" %}</a>
+	    {% else %}
+              <a href="{{ cred_views_search }}">{% trans "Search" %}</a>
+	    {% endif %}
           </li>
           {% endif %}
         </ul>

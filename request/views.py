@@ -108,6 +108,10 @@ def detail(request, cred_temp_id):
 
 	return render(request, 'request_detail.html', viewContext)
 
+@login_required
+def search(request):
+	return render(request, 'request_search.html', {})
+
 def send_cred_mail(user, cred, cred_id, description):
 	t = threading.Thread(target=send_thread, args=(user, cred, cred_id, description))
 	t.start()

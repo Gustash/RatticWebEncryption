@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand
-from request.Mailing import mail_manager
+from request.mailing import MailManager
 
 class Command(BaseCommand):
 	def handle(self, *args, **options):
-		mail_manager.update()
+		MailManager.update()

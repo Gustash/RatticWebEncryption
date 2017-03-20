@@ -2,6 +2,10 @@
 {% load i18n two_factor %}
 
 {% block content %}
+  <h2 style="color: red;">Wrong credentials.</h2>
+  <p>Please check your credentials.</p>
+
+  {% comment %}
   <h1>{% block title %}{% trans "Login" %}{% endblock %}</h1>
 
   {% if wizard.steps.current == 'auth' %}
@@ -49,4 +53,6 @@
 
     {% include "two_factor/_wizard_actions.html" %}
   </form>
+  {% endcomment %}
+
 {% endblock %}

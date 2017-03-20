@@ -30,6 +30,9 @@ class UserForm(forms.ModelForm):
         min_length=8
     )
 
+    field = models.IntegerField(User, editable=False, default=0)
+    field.contribute_to_class(User, 'self_group')
+
     def __init__(self, *args, **kwargs):
 	    super(UserForm, self).__init__(*args, **kwargs)
 

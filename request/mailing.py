@@ -16,10 +16,13 @@ class Message:
 	answer = None
 	cred_temp_id = None
 	mail = None
+	reply_num_id = None
+	num_id = None
 
 	def __init__(self, mail, id):
 		self.mail = mail
 		self._find_self_id(id)
+		self.num_id = id
 		if self._is_reply(id):
 			if self._get_answer(id):
 				self._get_reply(id)
@@ -61,7 +64,8 @@ class Message:
 
 	def _get_body(self, id, is_reply):
 		result, data = self.mail.uid('search', None, '(HEADER Message-ID "'+id+'")')
-		result, data = self.mail.uid('fetch', data[0].split()[-1], '(RFC822)')
+		self.reply_num_id = data[0].split()[-1]
+		result, data = self.mail.uid('fetch', self.reply_num_id, '(RFC822)')
 		if data[0]:
 			if data[0][1]:
 				email_message = email.message_from_string(data[0][1])
@@ -94,6 +98,7 @@ class Message:
 		if self.answer:
 			if self.cred_temp_id:
 				cred_temp = CredTemp.objects.get(id=self.cred_temp_id)
+				self._clean_mailbox()
 				if cred_temp.state == State.PENDING.value:
 					if 'yes' in self.answer: 
 						cred_temp.state = State.GRANTED.value
@@ -106,6 +111,13 @@ class Message:
 						cred_temp.save()
 						return True
 		return False
+
+	def _clean_mailbox(self):
+		self.mail.store("1:{0}".format(self.num_id), '+X-GM-LABELS', '\\Trash')
+		self.mail.store("1:{0}".format(self.reply_num_id), '+X-GM-LABELS', '\\Trash')
+		
+		self.mail.select('[Gmail]/Caixote do Lixo')
+		self.mail.store("1:*", '+FLAGS', '\\Deleted')
 
 class MailManager:
 	@staticmethod
@@ -126,5 +138,5 @@ class MailManager:
 			for message in messages[0].split(' '):
 				if message != '':
 					Message(mail, message).update_cred_temp()
-
+		mail.expunge()
 		mail.close()

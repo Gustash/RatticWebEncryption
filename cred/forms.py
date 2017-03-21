@@ -7,6 +7,7 @@ from ssh_key import SSHKey
 from models import Cred, Tag, Group
 from widgets import CredAttachmentInput, CredIconChooser
 
+from cipher import key_rsa
 from cipher import AESCipher
 from django.utils import timezone
 
@@ -39,7 +40,8 @@ class CredForm(ModelForm):
 
         # Limit the group options to groups that the user is in
         self.fields['group'].queryset = Group.objects.filter(user=requser)
-
+	
+	self.fields['group'].required = False
         self.fields['group'].label = _('Owner Group')
         self.fields['groups'].label = _('Viewers Groups')
 
@@ -52,7 +54,24 @@ class CredForm(ModelForm):
 	    encryptor = AESCipher(mesh)
 	    self.initial['password'] = encryptor.decrypt(self.instance.password)
 
+    def is_valid(self):
+	if not self.instance.created:
+	    self.instance.created = timezone.now()
+	if not self.group_id:
+	    self.group_id = self.user.self_group_id
+	valid = super(CredForm, self).is_valid()
+	logger.info(valid)
+	return valid
+
+    def clean(self):
+	cleaned_data = super(CredForm, self).clean()
+	if not cleaned_data.get('group'):
+	    group = Group.objects.get(id=self.user.self_group_id)
+	    cleaned_data['group'] = group
+	return cleaned_data
+
     def clean_password(self):
+	logger.info(self.group_id)
         if self.group_id:
 	    if (self.instance.id is None):
 	        created_date = timezone.now()
@@ -60,13 +79,20 @@ class CredForm(ModelForm):
       	        self.instance.created = created_date
 	    else:
 	        created_date = self.instance.created
-	    # Get the date the Group was created at
-	    group_date = Group.objects.filter(id=self.group_id)[0].created
-	    # Use a mesh of the date the cred is created and the date the group was created as a key
-	    mesh = AESCipher.mesh(str(created_date), str(group_date))
-	    password = self.cleaned_data['password']
-	    encryptor = AESCipher(mesh)
-	    return encryptor.encrypt(password)
+	    if self.group_id == self.user.self_group_id:
+		key = key_rsa()
+		key.save_key('KEY_FILE_RSA.pem')
+		logger.info(self.cleaned_data['password'])
+		return key.encrypt(str(self.cleaned_data['password']))
+	    else:
+	        # Get the date the Group was created at
+	        group_date = Group.objects.filter(id=self.group_id)[0].created
+	        # Use a mesh of the date the cred is created and the date the group was created as a key
+	        mesh = AESCipher.mesh(str(created_date), str(group_date))
+	        logger.info("Encription Mesh: " + mesh)
+	        password = self.cleaned_data['password']
+	        encryptor = AESCipher(mesh)
+	        return encryptor.encrypt(password)
         else:
             return self.cleaned_data['password']
 

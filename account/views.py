@@ -18,7 +18,9 @@ from two_factor.utils import default_device
 from two_factor.views import DisableView, BackupTokensView, SetupView, LoginView
 from datetime import timedelta
 import uuid
+import logging
 
+logger = logging.getLogger(__name__)
 
 @login_required
 def rattic_change_password(request, *args, **kwargs):
@@ -131,6 +133,22 @@ def ldap_password_change(request,
         context.update(extra_context)
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
+
+@login_required
+def upload_rsa(request):
+	logger.info('I was here!')
+	if request.method == 'POST':
+		uploaded_file = request.FILES['file_data']
+		filename = uploaded_file.name
+		if filename.endswith('.pem'):
+			data = uploaded_file.read()
+			logger.info("Data: " + data)
+			response = HttpResponseRedirect('/cred/list')
+			expiration_date = timezone.now() + timezone.timedelta(hours=3)
+			response.set_cookie(key='rsa_key', value=data, expires=expiration_date)
+			return response
+
+	return HttpResponseRedirect('/cred/list')
 
 
 class RatticSessionDeleteView(SessionDeleteView):

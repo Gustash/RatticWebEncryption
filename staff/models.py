@@ -30,7 +30,7 @@ class UserForm(forms.ModelForm):
         min_length=8
     )
 
-    field = models.IntegerField(User, editable=False, default=0)
+    field = models.ForeignKey('Group', related_name='self_group', on_delete=models.CASCADE, editable=False, default=0)
     field.contribute_to_class(User, 'self_group')
 
     def __init__(self, *args, **kwargs):

@@ -62,7 +62,7 @@
                   <a href="{{ request_home }}">{% trans "Request Privilege" %}</a>
                 </li>
                 <li>
-                  <a href="{% url "django.contrib.auth.views.logout" %}">{% trans "Logout" %}</a>
+                  <a href="{% url "account.views.logout_user" %}">{% trans "Logout" %}</a>
                 </li>
               {% else %}
                 <li>

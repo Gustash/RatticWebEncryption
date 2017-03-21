@@ -8,7 +8,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.contrib.auth.decorators import login_required
 from django.template.response import TemplateResponse
 from django.utils.timezone import now
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.views import password_change
 from django.contrib.auth.forms import SetPasswordForm
 from django.utils import timezone
@@ -150,6 +150,12 @@ def upload_rsa(request):
 
 	return HttpResponseRedirect('/cred/list')
 
+@login_required
+def logout_user(request):
+	logout(request)
+	response = HttpResponseRedirect('/')
+	response.delete_cookie('rsa_key')
+	return response
 
 class RatticSessionDeleteView(SessionDeleteView):
     def get_success_url(self):

@@ -1,7 +1,7 @@
 from django.conf.urls import include, patterns, url
 from django.conf import settings
 
-from views import profile, upload_rsa, newapikey, deleteapikey, RatticSessionDeleteView
+from views import profile, logout_user, upload_rsa, newapikey, deleteapikey, RatticSessionDeleteView
 from views import RatticTFADisableView, RatticTFABackupTokensView
 from views import RatticTFASetupView, RatticTFALoginView
 from views import RatticTFAGenerateApiKey
@@ -14,8 +14,7 @@ urlpatterns = patterns('',
     url(r'^newapikey/$', newapikey, {}),
     url(r'^deleteapikey/(?P<key_id>\d+)/$', deleteapikey, {}),
 
-    url(r'^logout/$', 'django.contrib.auth.views.logout', {
-        'next_page': settings.RATTIC_ROOT_URL}),
+    url(r'^logout/$', logout_user, {}),
 
     # View to kill other sessions with
     url(r'^killsession/(?P<pk>\w+)/', RatticSessionDeleteView.as_view(), name='kill_session'),

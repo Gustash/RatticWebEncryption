@@ -8,6 +8,7 @@
         <a class="btn" href="{% url "account.views.profile" %}">{% trans "Profile" %}</a>
         <a class="btn btn-danger" href="{% url "django.contrib.auth.views.logout" %}">{% trans "Logout" %}</a>
     <h4>{% trans "Private Encryption File" %}</h4>
+    <input id="#input-id" type="file" class="file" data-preview-file-type="text" >
     <h4><a href="{% url "cred.views.tags"  %}">{% trans "Tags" %}</a></h4>
     {% if user.is_authenticated %}
         {% for tag in user.profile.favourite_tags.all %}

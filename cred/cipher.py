@@ -1,5 +1,6 @@
 import base64
 import hashlib
+import ast
 from Crypto import Random
 from Crypto.Cipher import AES
 
@@ -33,3 +34,29 @@ class AESCipher(object):
     def mesh(s1, s2):
         return "".join(i + j for i, j in zip(s1, s2))
 
+class key_rsa:
+    key = None
+
+    def __init__(self, key=None):
+	if key:
+	    self.key = key
+	else:
+	    self.key = RSA.generate(2048, Random.new().read)
+
+    def encrypt(self, password):
+	return self.key.publicKey().encrypt(password, 32)
+
+    def decrypt(self, password):
+	return self.key.decrypt(ast.literal_eval(str(password)))
+
+    def save_key(self, file):
+	f = open(file, 'w')
+	f.write(self.key.exportKey(f.read()))
+	f.close()
+
+    @staticmethod
+    def load_key(file):
+	f = open(file, 'r')
+	key = key_rsa(RSA.importKey(f.read()))
+	f.close()
+	return key

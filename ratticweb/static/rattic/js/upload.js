@@ -1,7 +1,12 @@
 var $input = $("#input-0");
 console.log($input);
+
+var csrftoken = Cookies.get('csrftoken');
+console.log(csrftoken);
+
 $input.fileinput({
-	uploadUrl: "#",
+	uploadExtraData: {csrfmiddlewaretoken: csrftoken},
+	uploadUrl: "/account/upload/",
 	uploadAsync: false,
 	showUpload: false,
 	showRemove: false,

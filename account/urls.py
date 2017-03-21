@@ -1,7 +1,7 @@
 from django.conf.urls import include, patterns, url
 from django.conf import settings
 
-from views import profile, newapikey, deleteapikey, RatticSessionDeleteView
+from views import profile, upload_rsa, newapikey, deleteapikey, RatticSessionDeleteView
 from views import RatticTFADisableView, RatticTFABackupTokensView
 from views import RatticTFASetupView, RatticTFALoginView
 from views import RatticTFAGenerateApiKey
@@ -10,6 +10,7 @@ from two_factor.views import QRGeneratorView
 
 urlpatterns = patterns('',
     url(r'^$', profile, {}),
+    url(r'^upload/$', upload_rsa, {}),
     url(r'^newapikey/$', newapikey, {}),
     url(r'^deleteapikey/(?P<key_id>\d+)/$', deleteapikey, {}),
 

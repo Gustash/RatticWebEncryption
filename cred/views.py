@@ -17,6 +17,7 @@ from cred.icon import get_icon_list
 
 from django.contrib.auth.models import Group
 
+from cipher import key_rsa
 from cipher import AESCipher
 import logging
 
@@ -253,11 +254,11 @@ def detail(request, cred_id, cfilter='special', value='all', sortdir='descending
     # Create the key that was used to encrypt the password
 
     if request.user.self_group_id == cred.group.id:
-	logger.info("Private Group")
-
-    mesh = AESCipher.mesh(str(cred.created), str(cred.group.created))
-    cipher = AESCipher(mesh)
-    cred.password = cipher.decrypt(cred.password)
+	cred.password = key_rsa.load_key('KEY_FILE_RSA.pem').decrypt(cred.password)
+    else:
+	mesh = AESCipher.mesh(str(cred.created), str(cred.group.created))
+	cipher = AESCipher(mesh)
+	cred.password = cipher.decrypt(cred.password)
 
     state = dict()
     for s in State:

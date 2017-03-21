@@ -35,7 +35,7 @@ class AESCipher(object):
         return "".join(i + j for i, j in zip(s1, s2))
 
 class key_rsa:
-   key = None
+    key = None
 
     def __init__(self, key=None):
 	if key:

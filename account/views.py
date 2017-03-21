@@ -19,6 +19,7 @@ from two_factor.views import DisableView, BackupTokensView, SetupView, LoginView
 from datetime import timedelta
 import uuid
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -136,19 +137,24 @@ def ldap_password_change(request,
 
 @login_required
 def upload_rsa(request):
-	logger.info('I was here!')
 	if request.method == 'POST':
 		uploaded_file = request.FILES['file_data']
 		filename = uploaded_file.name
 		if filename.endswith('.pem'):
 			data = uploaded_file.read()
-			logger.info("Data: " + data)
-			response = HttpResponseRedirect('/cred/list')
+			payload = {'success': True }
+			response = HttpResponse(json.dumps(payload), content_type='application/json')
 			expiration_date = timezone.now() + timezone.timedelta(hours=3)
 			response.set_cookie(key='rsa_key', value=data, expires=expiration_date)
 			return response
 
 	return HttpResponseRedirect('/cred/list')
+
+@login_required
+def unload_rsa_key(request):
+	response = HttpResponseRedirect('/cred/list/')
+	response.delete_cookie('rsa_key')
+	return response
 
 @login_required
 def logout_user(request):

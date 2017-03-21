@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse, reverse_lazy
+from django.utils import timezone
 from django.http import HttpResponseRedirect, Http404
 from django.views.generic.edit import UpdateView, FormView
 from django.utils.decorators import method_decorator
@@ -162,6 +163,11 @@ class NewUser(FormView):
 	if form.cleaned_data['newpass'] is not None and len(form.cleaned_data['newpass']) > 0:
             user = form.save()
             user.set_password(form.cleaned_data['newpass'])
+            user.save()
+	    group = Group(name="private_" + str(user), created=timezone.now())
+	    group.save()
+            user.self_group = group
+            user.groups.add(group)
             user.save()
             return super(NewUser, self).form_valid(form)
 	return super(NewUser, self).form_invalid(form)

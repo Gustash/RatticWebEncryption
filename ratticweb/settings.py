@@ -237,6 +237,10 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'INFO'
         },
+	'staff':{
+	    'handlers': ['console'],
+	    'level': 'INFO'
+	},
     }
 }
 

@@ -6,6 +6,9 @@ from keepassdb.exc import AuthenticationError, InvalidDatabase
 from cred.models import CredAudit
 #from datetime import datetime
 from django.db import models
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AuditFilterForm(forms.Form):
     hide = forms.MultipleChoiceField(
@@ -30,6 +33,9 @@ class UserForm(forms.ModelForm):
         min_length=8
     )
 
+    field = models.IntegerField(User, editable=False, default=0)
+    field.contribute_to_class(User, 'self_group')
+
     def __init__(self, *args, **kwargs):
 	    super(UserForm, self).__init__(*args, **kwargs)
 
@@ -48,6 +54,9 @@ class UserForm(forms.ModelForm):
         cleaned_data = super(UserForm, self).clean()
         newpass = cleaned_data.get("newpass")
         confirmpass = cleaned_data.get("confirmpass")
+   	group = Group.objects.create(name='private_group_' + str(cleaned_data['username']))
+	
+	self.self_group = group.id
 
         if newpass != confirmpass:
             msg = _('Passwords do not match')

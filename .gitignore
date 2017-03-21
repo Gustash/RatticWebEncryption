@@ -13,3 +13,7 @@ celerybeat-schedule
 django.mo
 .ropeproject
 rattic.db
+account/migrations/*
+cred/migrations/*
+ratticweb/migrations/*
+

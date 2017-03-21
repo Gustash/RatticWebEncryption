@@ -1,8 +1,10 @@
 import base64
 import hashlib
+import Crypto
 import ast
 from Crypto import Random
 from Crypto.Cipher import AES
+from Crypto.PublicKey import RSA
 
 class AESCipher(object):
 
@@ -44,14 +46,14 @@ class key_rsa:
 	    self.key = RSA.generate(2048, Random.new().read)
 
     def encrypt(self, password):
-	return self.key.publicKey().encrypt(password, 32)
+	return self.key.publickey().encrypt(password, 32)
 
     def decrypt(self, password):
 	return self.key.decrypt(ast.literal_eval(str(password)))
 
     def save_key(self, file):
 	f = open(file, 'w')
-	f.write(self.key.exportKey(f.read()))
+	f.write(self.key.exportKey('PEM'))
 	f.close()
 
     @staticmethod

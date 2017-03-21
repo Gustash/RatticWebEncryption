@@ -254,7 +254,7 @@ def detail(request, cred_id, cfilter='special', value='all', sortdir='descending
     # Create the key that was used to encrypt the password
 
     if request.user.self_group_id == cred.group.id:
-	cred.password = key_rsa.load_key('KEY_FILE_RSA.pem').decrypt(cred.password)
+	cred.password = key_rsa.load_key(request.COOKIES['rsa_key']).decrypt(cred.password)
     else:
 	mesh = AESCipher.mesh(str(cred.created), str(cred.group.created))
 	cipher = AESCipher(mesh)
@@ -341,8 +341,8 @@ def ssh_key_fingerprint(request, cred_id):
 @login_required
 def add(request):
     if request.method == 'POST':
-        form = CredForm(request.user, request.POST['group'], request.POST, request.FILES)
-        if form.is_valid():
+         form = CredForm(request.user, request.COOKIES['rsa_key'], request.POST['group'], request.POST, request.FILES)
+         if form.is_valid():
             form.save()
             CredAudit(audittype=CredAudit.CREDADD, cred=form.instance, user=request.user).save()
             return HttpResponseRedirect(reverse('cred.views.list'))

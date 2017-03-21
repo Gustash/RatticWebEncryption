@@ -57,8 +57,8 @@ class key_rsa:
 	f.close()
 
     @staticmethod
-    def load_key(file):
-	f = open(file, 'r')
-	key = key_rsa(RSA.importKey(f.read()))
-	f.close()
-	return key
+    def load_key(key_str):
+#	f = open(file, 'r')
+#	key = key_rsa(RSA.importKey(f.read()))
+#	f.close()
+	return key_rsa(RSA.importKey(key_str))

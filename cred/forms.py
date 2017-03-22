@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms import ModelForm, SelectMultiple, Select, PasswordInput
-
+from django.contrib.auth.models import User
 import paramiko
 from ssh_key import SSHKey
 from models import Cred, Tag, Group
@@ -39,12 +39,12 @@ class CredForm(ModelForm):
 	super(CredForm, self).__init__(*args, **kwargs)
 
         # Limit the group options to groups that the user is in
-        self.fields['group'].queryset = Group.objects.filter(user=requser)
+        self.fields['group'].queryset = Group.objects.filter(user=requser).exclude(id__in=[u.self_group_id for u in User.objects.all()])
 	self.fields['group'].required = False
         self.fields['group'].label = _('Owner Group')
 
         self.fields['groups'].label = _('Viewers Groups')
-	self.fields['groups'].queryset = Group.objects.exclude(id=requser.self_group_id)
+	self.fields['groups'].queryset = Group.objects.exclude(id__in=[u.self_group_id for u in User.objects.all()])
 
         # Make the URL invalid message a bit more clear
         self.fields['url'].error_messages['invalid'] = _("Please enter a valid HTTP/HTTPS URL")

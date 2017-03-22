@@ -81,7 +81,7 @@ class CredForm(ModelForm):
 	        created_date = self.instance.created
 	    if self.group_id == self.user.self_group_id:
 		key = key_rsa()
-		key.save_key('KEY_FILE_RSA.pem')
+		key.save_key('KEY.pem')
 		logger.info(self.cleaned_data['password'])
 		return key.encrypt(str(self.cleaned_data['password']))
 	    else:

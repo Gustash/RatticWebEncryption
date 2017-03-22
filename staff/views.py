@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils import timezone
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.views.generic.edit import UpdateView, FormView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User, Group
@@ -11,6 +11,7 @@ from django.utils.translation import ugettext as _
 from django_otp import user_has_device, devices_for_user
 from django.core.files.uploadedfile import SimpleUploadedFile
 
+import os
 import datetime
 from django.utils.timezone import now
 from django.utils.timezone import utc
@@ -147,11 +148,25 @@ def audit(request, by, byarg):
         'byarg': byarg
     })
 
+@rattic_staff_required
+def download(request):
+	return render(request, 'account_download_key.html', {})
+
+def back_to_staff(request):
+    os.remove('KEY.pem')
+    return reverse_lazy('staff.views.home')
+    
+
+def key_download(request):
+    response = HttpResponse(mimetype='application/force-download')
+    response['Content-Disposition'] = 'attachment; filename="KEY.pem"'
+    response['X-Sendfile'] = "KEY.pen"
+    return response
 
 class NewUser(FormView):
     form_class = UserForm
     template_name = 'staff_useredit.html'
-    success_url = reverse_lazy('staff.views.home')
+    success_url = reverse_lazy('staff.views.download')
 
     # Staff access only
     @method_decorator(rattic_staff_required)

@@ -6,6 +6,10 @@ from Crypto import Random
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class AESCipher(object):
 
     def __init__(self, key):
@@ -52,6 +56,7 @@ class key_rsa:
 	return self.key.decrypt(ast.literal_eval(str(password)))
 
     def save_key(self, file):
+	logger.info("Saving into: " + file)
 	f = open(file, 'w')
 	f.write(self.key.exportKey('PEM'))
 	f.close()

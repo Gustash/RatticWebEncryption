@@ -63,5 +63,6 @@ if not settings.LDAP_ENABLED:
 # URLs we do want enabled with LDAP
 if settings.LDAP_ENABLED and settings.AUTH_LDAP_ALLOW_PASSWORD_CHANGE:
     urlpatterns += patterns('',
-        url(r'^changepass/$', 'account.views.ldap_password_change', {}, name='password_change')
+        url(r'^changepass/$', 'account.views.ldap_password_change', {}, name='password_change'),
+	url(r'^download', views.download, name='download')
     )

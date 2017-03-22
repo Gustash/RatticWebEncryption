@@ -39,8 +39,11 @@ class UserForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
 	    super(UserForm, self).__init__(*args, **kwargs)
+	    
+	    self_groups = Group.objects.filter(id__in=[x.self_group_id for x in User.objects.filter()])
 
 	    self.fields['email'].required = True
+	    self.fields['groups'].queryset = Group.objects.exclude(id__in=self_groups)
 
     # Define our model
     class Meta:

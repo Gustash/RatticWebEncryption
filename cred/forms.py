@@ -40,10 +40,11 @@ class CredForm(ModelForm):
 
         # Limit the group options to groups that the user is in
         self.fields['group'].queryset = Group.objects.filter(user=requser)
-	
 	self.fields['group'].required = False
         self.fields['group'].label = _('Owner Group')
+
         self.fields['groups'].label = _('Viewers Groups')
+	self.fields['groups'].queryset = Group.objects.exclude(id=requser.self_group_id)
 
         # Make the URL invalid message a bit more clear
         self.fields['url'].error_messages['invalid'] = _("Please enter a valid HTTP/HTTPS URL")

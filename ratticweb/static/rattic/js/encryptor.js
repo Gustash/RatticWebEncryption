@@ -1,17 +1,33 @@
 $('#cred-edit-form').submit(function(e) {
-	raw_password = $('#id_password').val();
-
-//	var keys = forge.pki.rsa.generateKeyPair(2048);
-//	var pem = forge.pki.publicKeyToPem(keys.publicKey);
-//	console.log(pem);
-//	console.log(keys.publicKey);
-	var privateKey = forge.pki.privateKeyFromPem(getKeyValue());
-	var publicKey = forge.pki.setRsaPublicKey(privateKey.n, privateKey.e);
-
-	var utf8 = forge.util.encodeUtf8(raw_password);
-	var ciphertext = publicKey.encrypt(utf8);
-	$('#id_password').val(ciphertext);
+	if (!($('#id_group').val())) {
+		raw_password = $('#id_password').val();
+		var privateKey = getPrivateKey();	
+		var publicKey = getPublicKey(privateKey);
+		var utf8 = forge.util.encodeUtf8(raw_password);
+		var ciphertext = forge.util.encode64(publicKey.encrypt(utf8));
+		$('#id_password').val(ciphertext);
+	}
 
 //	console.log('Canceling POST');
 //	e.preventDefault();
 });
+
+if ($('#password').is('span')) {
+	try {
+		var encryptedPassword = $('#password').text();
+		var privateKey = getPrivateKey();
+		var decrypted = privateKey.decrypt(forge.util.decode64(encryptedPassword));
+		var plaintext = forge.util.decodeUtf8(decrypted);
+		$('#password').text(plaintext);
+	} catch (err) {
+		// Not a private password. Do nothing.
+	}
+};
+
+function getPrivateKey() {
+	return forge.pki.privateKeyFromPem(getKeyValue());
+};
+
+function getPublicKey(privateKey) {
+	return forge.pki.setRsaPublicKey(privateKey.n, privateKey.e);
+};

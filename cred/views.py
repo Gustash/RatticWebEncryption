@@ -253,9 +253,7 @@ def detail(request, cred_id, cfilter='special', value='all', sortdir='descending
     
     # Create the key that was used to encrypt the password
 
-    if request.user.self_group_id == cred.group.id:
-	cred.password = key_rsa.load_key(request.COOKIES['rsa_key']).decrypt(cred.password)
-    else:
+    if request.user.self_group_id != cred.group.id:
 	mesh = AESCipher.mesh(str(cred.created), str(cred.group.created))
 	cipher = AESCipher(mesh)
 	cred.password = cipher.decrypt(cred.password)

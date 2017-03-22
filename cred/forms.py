@@ -126,7 +126,7 @@ class CredForm(ModelForm):
         widgets = {
             # Use chosen for the tag field
             'tags': SelectMultiple(attrs={'class': 'rattic-tag-selector'}),
-            'group': Select(attrs={'class': 'rattic-group-selector'}),
+            'group': Select(attrs={'class': 'rattic-group-selector', 'id': 'group_selector'}),
             'groups': SelectMultiple(attrs={'class': 'rattic-group-selector'}),
             'password': PasswordInput(render_value=True, attrs={'class': 'btn-password-generator btn-password-visibility'}),
             'ssh_key': CredAttachmentInput,

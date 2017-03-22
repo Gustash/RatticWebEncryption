@@ -10,9 +10,7 @@ urlpatterns = patterns('staff.views',
     url(r'^userdetail/(?P<uid>\d+)/$', 'userdetail'),
     url(r'^removetoken/(?P<uid>\d+)/$', 'removetoken'),
     url(r'^groupdetail/(?P<gid>\d+)/$', 'groupdetail'),
-    url(r'^download/$', 'download'),
-    url(r'^key_download/$', 'key_download'),
-    url(r'^back/$', 'back_to_staff'),
+    url(r'^download/', 'download'),
 
     # Auditing
     url(r'^audit-by-(?P<by>\w+)/(?P<byarg>\d+)/$', 'audit'),

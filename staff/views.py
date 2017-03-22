@@ -152,17 +152,6 @@ def audit(request, by, byarg):
 def download(request):
 	return render(request, 'account_download_key.html', {})
 
-def back_to_staff(request):
-    os.remove('KEY.pem')
-    return reverse_lazy('staff.views.home')
-    
-
-def key_download(request):
-    response = HttpResponse(mimetype='application/force-download')
-    response['Content-Disposition'] = 'attachment; filename="KEY.pem"'
-    response['X-Sendfile'] = "KEY.pen"
-    return response
-
 class NewUser(FormView):
     form_class = UserForm
     template_name = 'staff_useredit.html'

@@ -8,6 +8,6 @@
 {% block content %}
 <h1>Download private key</h1>
 </form>
-<a class="btn" href="{% url "staff.views.key_download" %}">{% trans "Download Key" %}</a>
-<a class="btn btn-danger" href="{% url "staff.views.back_to_staff" %}">{% trans "Back to Staff" %}</a>
+<a id="key_generator" class="btn">{% trans "Generate Key" %}</a>
+<a class="btn btn-danger" href="{% url "staff.views.home" %}">{% trans "Back to Staff" %}</a>
 {% endblock %}

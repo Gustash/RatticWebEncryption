@@ -9,7 +9,7 @@
         <a class="btn btn-danger" href="{% url "account.views.logout_user" %}">{% trans "Logout" %}</a>
     <h4>{% trans "Private Encryption File" %}</h4>
     <input style="display: none;" id="input-0" type="file" accept=".pem">
-    <p id="uploaded-notice" style="display: none;">{% trans "PEM file uploaded" %} (<a href="{% url 'account.views.unload_rsa_key'  %}">{% trans "Change" %}</a>)</p>
+    <p id="uploaded-notice" style="display: none;">{% trans "PEM file uploaded" %} (<a id="delete-cookie-anchor" href="#">{% trans "Change" %}</a>)</p>
     <h4><a href="{% url "cred.views.tags"  %}">{% trans "Tags" %}</a></h4>
     {% if user.is_authenticated %}
         {% for tag in user.profile.favourite_tags.all %}

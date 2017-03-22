@@ -341,7 +341,7 @@ def ssh_key_fingerprint(request, cred_id):
 @login_required
 def add(request):
     if request.method == 'POST':
-         form = CredForm(request.user, request.COOKIES['rsa_key'], request.POST['group'], request.POST, request.FILES)
+         form = CredForm(request.user, request.POST['group'], request.POST, request.FILES)
          if form.is_valid():
             form.save()
             CredAudit(audittype=CredAudit.CREDADD, cred=form.instance, user=request.user).save()

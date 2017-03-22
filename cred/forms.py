@@ -27,10 +27,8 @@ class TagForm(ModelForm):
 
 
 class CredForm(ModelForm):
-    def __init__(self, requser, rsa_key = None, group_id = None, *args, **kwargs):
+    def __init__(self, requser, group_id = None, *args, **kwargs):
 	self.user = requser
-	self.rsa_key = rsa_key
-	logger.info('RSA Key: ' + str(rsa_key))
 	if (group_id is not None):
 	    self.group_id = group_id
 
@@ -83,10 +81,11 @@ class CredForm(ModelForm):
 	        created_date = self.instance.created
 	    if self.group_id == self.user.self_group_id:
 #		key = key_rsa(self.rsa_key)
-		key = key_rsa.load_key(self.rsa_key)
+#		key = key_rsa.load_key(self.rsa_key)
 #		key.save_key('KEY_FILE_RSA.pem')
-		logger.info(self.cleaned_data['password'])
-		return key.encrypt(str(self.cleaned_data['password']))
+#		logger.info(self.cleaned_data['password'])
+#		return key.encrypt(str(self.cleaned_data['password']))
+		return self.cleaned_data['password']
 	    else:
 	        # Get the date the Group was created at
 	        group_date = Group.objects.filter(id=self.group_id)[0].created

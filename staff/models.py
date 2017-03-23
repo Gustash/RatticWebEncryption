@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from importloaders import keepass
@@ -72,6 +73,11 @@ class GroupForm(forms.ModelForm):
     if not hasattr(Group, 'created'):
     	field = models.DateTimeField(Group, auto_now_add=True)
     	field.contribute_to_class(Group, 'created')
+
+    def clean(self):
+	if (self.cleaned_data['name'].startswith('private_')):
+	    raise ValidationError('Group name cannot start with "private_"')
+        return self.cleaned_data
 
     class Meta:
         model = Group

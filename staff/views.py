@@ -22,6 +22,10 @@ from cred.forms import CredForm
 from models import UserForm, GroupForm, KeepassImportForm, AuditFilterForm
 from decorators import rattic_staff_required
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 @rattic_staff_required
 def home(request):
     userlist = User.objects.all()
@@ -77,6 +81,8 @@ def groupedit(request, gid):
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('staff.views.home'))
+        else:
+	    group = get_object_or_404(Group, pk=gid)
     else:
         form = GroupForm(instance=group)
 

@@ -194,3 +194,6 @@ class RatticTFAGenerateApiKey(LoginView):
         res = HttpResponse(newkey.key)
         res.status_code = 200
         return res
+
+def key_manage(request):
+   return render(request, "account_key_manage.html") 

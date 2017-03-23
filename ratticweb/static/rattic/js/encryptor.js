@@ -25,6 +25,7 @@ if ($('#password').is('span')) {
 		var plaintext = forge.util.decodeUtf8(decrypted);
 		$('#password').text(plaintext);
 	} catch (err) {
+		console.log(err.message);
 		if (err.message === "Invalid PEM formatted message.") {
 			// No key was loaded. Check if that was the case.
 			// But first check if the password is just a group one.
@@ -44,6 +45,46 @@ if ($('#password').is('span')) {
 		}
 	}
 };
+
+if ($('#id_password').is('input')) {
+	try {
+		var encryptedPassword = $('#id_password').val();
+		var privateKey = getPrivateKey();
+		var decrypted = privateKey.decrypt(forge.util.decode64(encryptedPassword));
+		var plaintext = forge.util.decodeUtf8(decrypted);
+		$('#id_password').val(plaintext);
+	} catch (err) {
+		console.log(err.message);
+		if (err.message === "Invalid PEM formatted message.") {
+			// No key was loaded. Check if that was the case.
+			// But first check if the password is just a group one.
+			if ($('#owner-group-id').is('td')) {
+				if ($('#owner-group-id').text().startsWith("private_")) {
+					// This is a private key. Warn user they have no key.
+					if (getKeyValue() === null) {
+						alert("No PEM encryption key was loaded.");
+						window.location.href = '/cred/list/';
+					}
+				}
+			} else if ($('#group_selector').is('select')) {
+				// The user is editing an existing cred. Check if it is a group one or not.
+				console.log($('#group_selector').find(':selected').val() === '');
+				if ($('#id_password').val() !== '' && $('#group_selector').find(':selected').val() === '') {
+					if (getKeyValue() === null) {
+						alert("No PEM encryption key was loaded.");
+						window.location.href = '/cred/list/';
+					}
+				}
+			}	
+		} else if (err.message === "Encrypted message length is invalid.") {
+			// This is a group pass. Do nothing.
+		} else if (err.message === "Encryption block is invalid.") {
+			// The wrong key was used to decrypt. Warn user.
+			alert("The PEM encryption key provided is not the same that was used to encrypt this password."); 
+			window.location.href = '/cred/list/';
+		}
+	}
+}
 
 function getPrivateKey() {
 	return forge.pki.privateKeyFromPem(getKeyValue());

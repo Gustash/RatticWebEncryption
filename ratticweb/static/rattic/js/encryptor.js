@@ -32,6 +32,7 @@ if ($('#password').is('span')) {
 				// This is a private key. Warn user they have no key.
 				if (getKeyValue() === null) {
 					alert("No PEM encryption key was loaded.");
+					window.location.href = '/cred/list/';
 				}
 			}
 		} else if (err.message === "Encrypted message length is invalid.") {
@@ -39,6 +40,7 @@ if ($('#password').is('span')) {
 		} else if (err.message === "Encryption block is invalid.") {
 			// The wrong key was used to decrypt. Warn user.
 			alert("The PEM encryption key provided is not the same that was used to encrypt this password."); 
+			window.location.href = '/cred/list/';
 		}
 	}
 };

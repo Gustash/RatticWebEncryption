@@ -13,6 +13,11 @@ def markdown(request, page):
     if not os.path.exists(filename):
         raise Http404
 
+    if page == 'Error':
+	return render(request, 'help_no_js.html', {
+	    'redirect_to_nojs': False,
+	})
+
     latestcopy = settings.PUBLIC_HELP_WIKI_BASE + page
 
     return render(request, 'help_markdown.html', {
@@ -23,3 +28,8 @@ def markdown(request, page):
 
 def home(request):
     return markdown(request, 'Home')
+
+def nojavascript(request):
+    return render(request, 'help_nojs.html', {
+	'is_nojs_page': True,
+    })

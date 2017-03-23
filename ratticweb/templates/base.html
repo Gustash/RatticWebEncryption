@@ -31,6 +31,11 @@
   <link href="{% static "favicon_new.ico" %}" rel="shortcut icon">
 </head>
 <body>
+<noscript>
+	{% if not is_nojs_page %}
+	<meta http-equiv="refresh" content="0;url=/help/error/">
+	{% endif %}
+</noscript>
 <div id="wrap">
     <div class="container-fluid">
          {% include "navbar.html" %}

@@ -195,6 +195,12 @@ class UpdateUser(UpdateView):
             form.instance.set_password(form.cleaned_data['newpass'])
         # If user is having groups removed we want change advice for those
         # groups
+	groups = []
+	for g in Group.objects.all():
+	    if g in form.cleaned_data['groups'] or g.id == form.instance.self_group_id:
+		groups.append(g)
+	form.cleaned_data['groups'] = groups
+	
         if form.instance.is_active and 'groups' in form.changed_data:
             # Get a list of the missing groups
             missing_groups = []

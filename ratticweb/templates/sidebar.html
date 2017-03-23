@@ -6,7 +6,7 @@
     <h4>{% trans "You" %}</h4>
         <p>{% blocktrans with username=user.username|title %}Welcome {{ username }}.{% endblocktrans %}<p>
         <a class="btn" href="{% url "account.views.profile" %}">{% trans "Profile" %}</a>
-        <a class="btn btn-danger" href="{% url "account.views.logout_user" %}">{% trans "Logout" %}</a>
+        <a id="logout-button" class="btn btn-danger" href="{% url "account.views.logout_user" %}">{% trans "Logout" %}</a>
     <h4>{% trans "Private Encryption File" %}</h4>
     <input style="display: none;" id="input-0" type="file" accept=".pem">
     <p id="uploaded-notice" style="display: none;">{% trans "PEM file uploaded" %} (<a id="delete-cookie-anchor" href="#">{% trans "Change" %}</a>)</p>

@@ -42,13 +42,20 @@ class CredForm(ModelForm):
 	if self.instance.group_id not in [user.self_group_id for user in User.objects.all()]:
 		self.fields['group'].widget = Select(attrs={'class': 'rattic-group-selector', 'id': 'group_selector'})
 		self.fields['group'].label = _('Owner Group')
+
+		
+       		self.fields['groups'].widget = SelectMultiple(attrs={'class': 'rattic-group-selector'})
+		self.fields['groups'].label = _('Viewers Groups')
 	else:
 		self.fields['group'].widget = forms.HiddenInput()
 		self.fields['group'].label = ''
+
+       		self.fields['groups'].widget = forms.HiddenInput()
+		self.fields['groups'].label = ''
+
         self.fields['group'].queryset = Group.objects.filter(user=requser).exclude(id__in=[u.self_group_id for u in User.objects.all()])
 	self.fields['group'].required = False
 
-        self.fields['groups'].label = _('Viewers Groups')
 	self.fields['groups'].queryset = Group.objects.exclude(id__in=[u.self_group_id for u in User.objects.all()])
 
         # Make the URL invalid message a bit more clear
@@ -136,7 +143,7 @@ class CredForm(ModelForm):
             # Use chosen for the tag field
             'tags': SelectMultiple(attrs={'class': 'rattic-tag-selector'}),
             #'group': Select(attrs={'class': 'rattic-group-selector', 'id': 'group_selector'}),
-            'groups': SelectMultiple(attrs={'class': 'rattic-group-selector'}),
+            #'groups': SelectMultiple(attrs={'class': 'rattic-group-selector'}),
             'password': PasswordInput(render_value=True, attrs={'class': 'btn-password-generator btn-password-visibility'}),
             'ssh_key': CredAttachmentInput,
             'attachment': CredAttachmentInput,

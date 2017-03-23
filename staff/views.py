@@ -22,11 +22,10 @@ from cred.forms import CredForm
 from models import UserForm, GroupForm, KeepassImportForm, AuditFilterForm
 from decorators import rattic_staff_required
 
-
 @rattic_staff_required
 def home(request):
     userlist = User.objects.all()
-    grouplist = Group.objects.all()
+    grouplist = Group.objects.exclude(id__in=[user.self_group_id for user in User.objects.all()])
     return render(request, 'staff_home.html', {'userlist': userlist, 'grouplist': grouplist})
 
 
@@ -97,6 +96,8 @@ def groupdelete(request, gid):
 def userdelete(request, uid):
     user = get_object_or_404(User, pk=uid)
     if request.method == 'POST':
+	group = Group.objects.get(id=user.self_group_id)
+	group.delete()
         user.delete()
         return HttpResponseRedirect(reverse('staff.views.home'))
     return render(request, 'staff_userdetail.html', {'viewuser': user, 'delete': True})

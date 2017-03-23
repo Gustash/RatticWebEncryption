@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title%}{% trans "Manage Your Key" %}{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <h4>{% trans "Private Encryption File" %}</h4>
+    <input style="display: none;" id="input-0" type="file" accept=".pem">
+    <p id="uploaded-notice" style="display: none;">{% trans "PEM file uploaded" %}
+	<br /><button class="btn btn-danger" id="delete-cookie-anchor" href="#">{% trans "Change" %}</button>
+    </p>
+</div>
+{% endblock %}

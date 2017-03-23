@@ -49,11 +49,15 @@ class CredForm(ModelForm):
         # Make the URL invalid message a bit more clear
         self.fields['url'].error_messages['invalid'] = _("Please enter a valid HTTP/HTTPS URL")
 
-	# If the cred already exists, decrypt the password before you show it on the PasswordInput
-	if (self.instance.id is not None):
-	    mesh = AESCipher.mesh(str(self.instance.created), str(self.instance.group.created))
-	    encryptor = AESCipher(mesh)
-	    self.initial['password'] = encryptor.decrypt(self.instance.password)
+	# Check if cred already exists
+        if (self.instance.id is not None):
+	    # Only decrypt password if it isn't a private one
+	    if not len(User.objects.filter(self_group=self.instance.group)) > 0:
+	        # Decrypt the password before you show it on the PasswordInput
+	        if (self.instance.id is not None):
+	           mesh = AESCipher.mesh(str(self.instance.created), str(self.instance.group.created))
+	           encryptor = AESCipher(mesh)
+	           self.initial['password'] = encryptor.decrypt(self.instance.password)
 
     def is_valid(self):
 	if not self.instance.created:

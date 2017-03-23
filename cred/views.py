@@ -15,7 +15,7 @@ from forms import ExportForm, CredForm, TagForm
 from exporters import export_keepass
 from cred.icon import get_icon_list
 
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 
 from cipher import key_rsa
 from cipher import AESCipher
@@ -253,7 +253,8 @@ def detail(request, cred_id, cfilter='special', value='all', sortdir='descending
     
     # Create the key that was used to encrypt the password
 
-    if request.user.self_group_id != cred.group.id:
+    # If there is a user with the group as self_group, it's a private password
+    if not len(User.objects.filter(self_group_id=cred.group.id)) > 0:
 	mesh = AESCipher.mesh(str(cred.created), str(cred.group.created))
 	cipher = AESCipher(mesh)
 	cred.password = cipher.decrypt(cred.password)

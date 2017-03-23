@@ -5,6 +5,7 @@
 {% block content %}
 <h1>{% if not group %}{% trans "Create Group" %}{% else %}{% trans "Edit Group" %}: {{ group.name }}{% endif %}</h1>
 <form class="form-horizontal" action="" method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
     {% for field in form %}
         <div class="control-group">
             {{ field.errors }}

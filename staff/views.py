@@ -96,8 +96,11 @@ def groupdelete(request, gid):
 def userdelete(request, uid):
     user = get_object_or_404(User, pk=uid)
     if request.method == 'POST':
-	group = Group.objects.get(id=user.self_group_id)
-	group.delete()
+	try:
+		group = Group.objects.get(id=user.self_group_id)
+		group.delete()
+	except:
+		pass
         user.delete()
         return HttpResponseRedirect(reverse('staff.views.home'))
     return render(request, 'staff_userdetail.html', {'viewuser': user, 'delete': True})

@@ -1,6 +1,8 @@
 from django.conf.urls import include, patterns, url
 from django.conf import settings
 
+from . import views
+
 from views import profile, logout_user, newapikey, deleteapikey, RatticSessionDeleteView
 from views import RatticTFADisableView, RatticTFABackupTokensView
 from views import RatticTFASetupView, RatticTFALoginView
@@ -12,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^$', profile, {}),
     url(r'^newapikey/$', newapikey, {}),
     url(r'^deleteapikey/(?P<key_id>\d+)/$', deleteapikey, {}),
+    url(r'^key_manage/$', views.key_manage),
 
     url(r'^logout/$', logout_user, {}),
 

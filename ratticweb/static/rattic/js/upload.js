@@ -60,12 +60,16 @@ function keyIsValid(key) {
 	}
 }
 
-var $input = $("#input-0");
-var $uploaded_notice = $("#uploaded-notice");
-var $remove_anchor = $("#delete-cookie-anchor");
+var $input = $("body [id='input-0']");
+var $uploaded_notice = $("body [id='uploaded-notice']");
+var $remove_anchor = $("body [id='delete-cookie-anchor']");
 var $logout_button = $('#logout-button');
 var rsa_key = getKeyValue();
 checkIfKeyIsExpired();
+
+console.log("ONE:" + $('body [id="input-0"]').length)
+console.log("TWO:" + $('body [id="uploaded-notice"]').length)
+console.log("THREE:" + $('body [id="delete-cookie-anchor"]').length)
 
 $logout_button.click(function () {
 	if (getKeyValue() !== null) {
@@ -78,47 +82,61 @@ $logout_button.click(function () {
 });
 
 if (rsa_key == null) {
-	$input.show();
-	$input.fileinput({
-		showUpload: false,
-		showRemove: false,
-		showPreview: false,
-		showCaption: false,
-		minFileCount: 1,
-		maxFileCount: 1,
-	}).on("filebatchselected", function(event, files) {
-		console.log(files);
-		console.log(files[0].name.endsWith('.pem'));
-		if (files[0].name.endsWith('.pem')) {
-			var reader = new FileReader();
-
-			reader.onload = function (e) {
-				if (keyIsValid(e.target.result)) {
-					if (localStorageAvailable) {
-						saveKey(e.target.result);
-					} else {
-						saveCookie(e.target.result);
-					}
-					window.location.href = window.location.href;
-				} else {
-					alert('The provided PEM encryption key is not valid.');
-				}
-			}
-			reader.readAsText(files[0]);
-		} else {
-			alert('The provided file is not a PEM encryption key.');
+	$input.each(
+		function(){
+			$(this).show();
 		}
+	)
+	$input.each(function(){
+		$(this).fileinput({
+			showUpload: false,
+			showRemove: false,
+			showPreview: false,
+			showCaption: false,
+			minFileCount: 1,
+			maxFileCount: 1,
+		}).on("filebatchselected", function(event, files) {
+			console.log(files);
+			console.log(files[0].name.endsWith('.pem'));
+			if (files[0].name.endsWith('.pem')) {
+				var reader = new FileReader();
 
+				reader.onload = function (e) {
+					if (keyIsValid(e.target.result)) {
+						if (localStorageAvailable) {
+							saveKey(e.target.result);
+						} else {
+							saveCookie(e.target.result);
+						}
+						window.location.href = window.location.href;
+					} else {
+						alert('The provided PEM encryption key is not valid.');
+					}
+				}
+				reader.readAsText(files[0]);
+			} else {
+				alert('The provided file is not a PEM encryption key.');
+			}
+
+		});
 	});
 } else {
-	$uploaded_notice.show();
-	$remove_anchor.click(function() {
-		if (localStorageAvailable) {
-			deleteKey();
-		} else {
-			deleteCookie();
+	$uploaded_notice.each(
+		function(){
+			$(this).show();
 		}
-		window.location.href = window.location.href;
-	});
+	)
+	$remove_anchor.each(
+		function(){
+			$(this).click(function() {
+			if (localStorageAvailable) {
+				deleteKey();
+			} else {
+				deleteCookie();
+			}
+			window.location.href = window.location.href;
+			});
+		}
+	)
 }
 

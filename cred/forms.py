@@ -46,10 +46,12 @@ class CredForm(ModelForm):
        		self.fields['groups'].widget = SelectMultiple(attrs={'class': 'rattic-group-selector'})
 		self.fields['groups'].label = _('Viewers Groups')
 	else:
-		self.fields['group'].widget = Select(attrs={'id': 'group_selector', 'style': 'display: none'})
+		logger.info('I am here')
+#		self.fields['group'].widget = Select(attrs={'id': 'group_selector', 'style': 'display: none'})
+		self.fields['group'].widget = Select(attrs={'id': 'group_selector', 'class': 'hidden-select'})
 		self.fields['group'].label = ''
 
-       		self.fields['groups'].widget = SelectMultiple(attrs={'id': 'id_groups', 'style': 'display: None'})
+       		self.fields['groups'].widget = SelectMultiple(attrs={'id': 'id_groups', 'class': 'hidden-select'})
 		self.fields['groups'].label = ''
 
         # Limit the group options to groups that the user is in

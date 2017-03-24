@@ -14,19 +14,23 @@ $(document).ready(function() {
 $('#cred-edit-form').submit(function(e) {
 	if ($('#group_selector').is('select')) {
 		if ($('#group_selector').find(':selected').val() === '') {
-			console.log(cant_be_private);
 			if (!cant_be_private) {
-				// This is a private password. Encrypt server side.	
-				if (getKeyValue() !== null) {
-					raw_password = $('#id_password').val();
-					var privateKey = getPrivateKey();	
-					var publicKey = getPublicKey(privateKey);
-					var utf8 = forge.util.encodeUtf8(raw_password);
-					var ciphertext = forge.util.encode64(publicKey.encrypt(utf8));
-					$('#id_password').val(ciphertext);
+				if ($('#id_groups').find('option').length === 0) {
+					// This is a private password. Encrypt server side.	
+					if (getKeyValue() !== null) {
+						raw_password = $('#id_password').val();
+						var privateKey = getPrivateKey();	
+						var publicKey = getPublicKey(privateKey);
+						var utf8 = forge.util.encodeUtf8(raw_password);
+						var ciphertext = forge.util.encode64(publicKey.encrypt(utf8));
+						$('#id_password').val(ciphertext);
+					} else {
+						console.log('No key loaded');
+						alert('You need to load a PEM encryption key file in order to create private passwords.');
+						e.preventDefault();
+					}
 				} else {
-					console.log('No key loaded');
-					alert('You need to load a PEM encryption key file in order to create private passwords.');
+					alert('A private password can\'t have Viewer Groups. Either select an Owner Group or remove the Viewer Groups.');
 					e.preventDefault();
 				}
 			 } else {
@@ -34,23 +38,8 @@ $('#cred-edit-form').submit(function(e) {
 				alert('The password you\'re editting is in a group. You need to select a group.');
 				e.preventDefault();
 			 }
-		} else {
-		
 		}
 	}
-//	if (!($('#id_group').val())) {
-//		if (getKeyValue() !== null) {
-//		raw_password = $('#id_password').val();
-//		var privateKey = getPrivateKey();	
-//		var publicKey = getPublicKey(privateKey);
-//		var utf8 = forge.util.encodeUtf8(raw_password);
-//		var ciphertext = forge.util.encode64(publicKey.encrypt(utf8));
-//		$('#id_password').val(ciphertext);
-//		} else {
-//			console.log('No key loaded');
-//			e.preventDefault();
-//		}
-//	}
 
 //	console.log('Canceling POST');
 //	e.preventDefault();

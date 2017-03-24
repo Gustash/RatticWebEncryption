@@ -140,13 +140,20 @@ def send_thread(request, cred_temp):
 		#Get users email
 		mails.append(u.email)	
 	
+	#Create the subject of the mail
 	subject = 'Password requested by ' + str(request.user)
+	#Get the full link to the 'cred' to which privilege is being requested
 	cred_link = "http://" + request.get_host() + reverse('cred.views.detail', kwargs={'cred_id':cred_temp.cred_id}) 
+	#Get the full link to the newly created 'cred_temp'
 	cred_temp_link = "http://" + request.get_host() + reverse('request.views.detail', kwargs={'cred_temp_id':cred_temp.id})
+	#Get the full link to the user which is requesting the privilege
 	user_link = "http://" + request.get_host() + reverse('staff.views.userdetail', kwargs={'uid':cred_temp.user_id})
+	#Generate html content for the mail
 	html_content = render_to_string('request_mail.html', {'user':str(request.user), 'title':str(cred_temp.cred), 'user_link':user_link,'cred_temp_link':cred_temp_link, 'cred_link':cred_link, 'temp_id':str(cred_temp.id), 'description': cred_temp.description})
+	#Generate the message with 'html tags' aplied
 	text_content = strip_tags(html_content)
 
+	#Send the email
 	msg = EmailMultiAlternatives(subject, text_content, 'testdjango88@gmail.com', mails)
 	msg.attach_alternative(html_content, "text/html")
 	msg.send()

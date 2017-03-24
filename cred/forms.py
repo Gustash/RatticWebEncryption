@@ -47,10 +47,10 @@ class CredForm(ModelForm):
        		self.fields['groups'].widget = SelectMultiple(attrs={'class': 'rattic-group-selector'})
 		self.fields['groups'].label = _('Viewers Groups')
 	else:
-		self.fields['group'].widget = forms.HiddenInput()
+		self.fields['group'].widget = Select(attrs={'id': 'esconder_1', 'style': 'display: none'})
 		self.fields['group'].label = ''
 
-       		self.fields['groups'].widget = forms.HiddenInput()
+       		self.fields['groups'].widget = SelectMultiple(attrs={'id': 'esconder_2', 'style': 'display: None'})
 		self.fields['groups'].label = ''
 
         self.fields['group'].queryset = Group.objects.filter(user=requser).exclude(id__in=[u.self_group_id for u in User.objects.all()])

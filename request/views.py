@@ -125,10 +125,21 @@ def send_cred_mail(request, cred_temp):
 	t.start()
 
 def send_thread(request, cred_temp):
+	#Get all 'staff' users
 	users = User.objects.filter(is_staff=True)
+	#Remove all users that do not belong to the cred_temp's group
+	for u in users: #Foreach user
+		#Check if cred_temp's group is not in user's group list
+		if not cred_temp.cred.group in u.groups.all():
+			#Remove the user from users list
+			users = users.exclude(id=u.id)
+	#All emails
 	mails = []
+	#Foreach user
 	for u in users:
+		#Get users email
 		mails.append(u.email)	
+	
 	subject = 'Password requested by ' + str(request.user)
 	cred_link = "http://" + request.get_host() + reverse('cred.views.detail', kwargs={'cred_id':cred_temp.cred_id}) 
 	cred_temp_link = "http://" + request.get_host() + reverse('request.views.detail', kwargs={'cred_temp_id':cred_temp.id})

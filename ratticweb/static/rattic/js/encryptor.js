@@ -15,7 +15,7 @@ $('#cred-edit-form').submit(function(e) {
 	if ($('#group_selector').is('select')) {
 		if ($('#group_selector').find(':selected').val() === '') {
 			if (!cant_be_private) {
-				if ($('#id_groups').find('option').length === 0) {
+				if ($('#id_groups').find(':selected').length === 0) {
 					// This is a private password. Encrypt server side.	
 					if (getKeyValue() !== null) {
 						raw_password = $('#id_password').val();

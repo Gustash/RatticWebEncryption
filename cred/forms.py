@@ -38,7 +38,6 @@ class CredForm(ModelForm):
 
 	super(CredForm, self).__init__(*args, **kwargs)
 
-        # Limit the group options to groups that the user is in
 	if self.instance.group_id not in [user.self_group_id for user in User.objects.all()]:
 		self.fields['group'].widget = Select(attrs={'class': 'rattic-group-selector', 'id': 'group_selector'})
 		self.fields['group'].label = _('Owner Group')
@@ -47,12 +46,13 @@ class CredForm(ModelForm):
        		self.fields['groups'].widget = SelectMultiple(attrs={'class': 'rattic-group-selector'})
 		self.fields['groups'].label = _('Viewers Groups')
 	else:
-		self.fields['group'].widget = Select(attrs={'id': 'esconder_1', 'style': 'display: none'})
+		self.fields['group'].widget = Select(attrs={'id': 'group_selector', 'style': 'display: none'})
 		self.fields['group'].label = ''
 
-       		self.fields['groups'].widget = SelectMultiple(attrs={'id': 'esconder_2', 'style': 'display: None'})
+       		self.fields['groups'].widget = SelectMultiple(attrs={'id': 'id_groups', 'style': 'display: None'})
 		self.fields['groups'].label = ''
 
+        # Limit the group options to groups that the user is in
         self.fields['group'].queryset = Group.objects.filter(user=requser).exclude(id__in=[u.self_group_id for u in User.objects.all()])
 	self.fields['group'].required = False
 

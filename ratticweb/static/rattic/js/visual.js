@@ -12,11 +12,11 @@ $(document).ready(function() {
 	//if (!is_groups_visible) {
 	//	groups_input.parent().parent().hide();
 	//}
-	if($('#esconder_1').length){
-		$('#esconder_1').parent().parent().hide();
+	if(!$('#id_groups').is(':visible')){
+		$('#id_groups').parent().parent().hide();
 	}
 
-	if($('#esconder_2').length){
-		$('#esconder_2').parent().parent().hide();
+	if(!$('#group_selector').is(':visible')){
+		$('#group_selector').parent().parent().hide();
 	}
 });

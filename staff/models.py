@@ -73,6 +73,8 @@ class GroupForm(forms.ModelForm):
     if not hasattr(Group, 'created'):
     	field = models.DateTimeField(Group, auto_now_add=True)
     	field.contribute_to_class(Group, 'created')
+	field = models.ManyToManyField(Group, User, default=0)
+	field.contribute_to_class(Group, 'owners')
 
     def clean(self):
 	if (self.cleaned_data['name'].startswith('private_')):

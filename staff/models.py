@@ -82,17 +82,15 @@ class GroupForm(forms.ModelForm):
             label = _('Owners')
         )
 
-    def clean(self):
-        if (self.cleaned_data['name'].startswith('private_')):
-            raise ValidationError('Group name cannot start with "private_"')
-        return self.cleaned_data
+    def clean_name(self):
+        if (self.cleaned_data['name']):
+            if (self.cleaned_data['name'].startswith('private_')):
+                raise ValidationError('Group name cannot start with "private_"')
+        return self.cleaned_data['name']
 
     class Meta:
         model = Group
         fields = ('name',)
-        permissions = (
-            ('is_owner', 'Is owner'),
-        )
 
 class KeepassImportForm(forms.Form):
     file = forms.FileField()

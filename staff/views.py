@@ -23,6 +23,7 @@ from models import UserForm, GroupForm, KeepassImportForm, AuditFilterForm
 from decorators import rattic_staff_required
 
 import logging
+import permissions
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +64,14 @@ def groupadd(request):
 	    for user in request.POST.getlist('users'):
 		User.objects.get(id=user).groups.add(form.instance)
             #request.user.groups.add(form.instance)
-            return HttpResponseRedirect(reverse('staff.views.home'))
+        owners = form.data.getlist('owners')
+        permission = permissions.add_owner_permission(form.instance.id, form.instance.name)
+        logger.info(permission)
+        for user in User.objects.filter(id__in=owners):
+            user.user_permissions.add(permission)
+            user.save()
+#            request.user.groups.add(form.instance)
+        return HttpResponseRedirect(reverse('staff.views.home'))
     else:
         form = GroupForm()
 
@@ -79,6 +87,7 @@ def groupdetail(request, gid):
 @rattic_staff_required
 def groupedit(request, gid):
     group = get_object_or_404(Group, pk=gid)
+    logger.info(vars(group.permissions))
     if request.method == 'POST':
         form = GroupForm(request.POST, instance=group)
         if form.is_valid():

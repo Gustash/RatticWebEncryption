@@ -40,12 +40,12 @@ class UserForm(forms.ModelForm):
     field.contribute_to_class(User, 'self_group')
 
     def __init__(self, *args, **kwargs):
-	    super(UserForm, self).__init__(*args, **kwargs)
-	    
-	    self_groups = Group.objects.filter(id__in=[x.self_group_id for x in User.objects.filter()])
+        super(UserForm, self).__init__(*args, **kwargs)
+        
+        self_groups = Group.objects.filter(id__in=[x.self_group_id for x in User.objects.filter()])
 
-	    self.fields['email'].required = True
-	    self.fields['groups'].queryset = Group.objects.exclude(id__in=self_groups)
+        self.fields['email'].required = True
+        self.fields['groups'].queryset = Group.objects.exclude(id__in=self_groups)
 
     # Define our model
     class Meta:
@@ -82,13 +82,22 @@ class GroupForm(forms.ModelForm):
 
     # Extend the Group model by adding a created column to save the date the Group was created at
     if not hasattr(Group, 'created'):
-    	field = models.DateTimeField(Group, auto_now_add=True)
-    	field.contribute_to_class(Group, 'created')
+        field = models.DateTimeField(Group, auto_now_add=True)
+        field.contribute_to_class(Group, 'created')
 
-    def clean(self):
-	if (self.cleaned_data['name'].startswith('private_')):
-	    raise ValidationError('Group name cannot start with "private_"')
-        return self.cleaned_data
+    def __init__(self, *args, **kwargs):
+        super(GroupForm, self).__init__(*args, **kwargs)
+        self.fields['owners'] = forms.ModelMultipleChoiceField(
+            queryset=User.objects.all(),
+            widget=forms.SelectMultiple(attrs={'class': 'rattic-group-selector'}),
+            label = _('Owners')
+        )
+
+    def clean_name(self):
+        if (self.cleaned_data['name']):
+            if (self.cleaned_data['name'].startswith('private_')):
+                raise ValidationError('Group name cannot start with "private_"')
+        return self.cleaned_data['name']
 
     class Meta:
         model = Group

@@ -57,9 +57,11 @@ def userdetail(request, uid):
 def groupadd(request):
     if request.method == 'POST':
         form = GroupForm(request.POST)
+        logger.info('Data: ' + str(form.data))
+        logger.info('Owners: ' + str(form.data.getlist('owners')))
         if form.is_valid():
-            form.save()
-            request.user.groups.add(form.instance)
+            form.save(commit=False)
+#            request.user.groups.add(form.instance)
             return HttpResponseRedirect(reverse('staff.views.home'))
     else:
         form = GroupForm()
@@ -76,6 +78,7 @@ def groupdetail(request, gid):
 @rattic_staff_required
 def groupedit(request, gid):
     group = get_object_or_404(Group, pk=gid)
+    logger.info(vars(group.permissions))
     if request.method == 'POST':
         form = GroupForm(request.POST, instance=group)
         if form.is_valid():

@@ -57,15 +57,15 @@ def userdetail(request, uid):
 @rattic_staff_required
 def groupadd(request):
     if request.method == 'POST':
-	logger.info(request.POST)
+        logger.info(request.POST)
         form = GroupForm(request.POST)
         if form.is_valid():
             form.save()
-	    for user in request.POST.getlist('users'):
-		User.objects.get(id=user).groups.add(form.instance)
+        for user in request.POST.getlist('users'):
+            User.objects.get(id=user).groups.add(form.instance)
             #request.user.groups.add(form.instance)
         owners = form.data.getlist('owners')
-        permission = permissions.add_owner_permission(form.instance.id, form.instance.name)
+        permission = permissions.get_or_set_owner_permission(form.instance.id, form.instance.name)
         logger.info(permission)
         for user in User.objects.filter(id__in=owners):
             user.user_permissions.add(permission)
@@ -80,25 +80,41 @@ def groupadd(request):
 
 @rattic_staff_required
 def groupdetail(request, gid):
+    is_owner = request.user.has_perm("auth.is_owner_" + gid)
     group = get_object_or_404(Group, pk=gid)
-    return render(request, 'staff_groupdetail.html', {'group': group})
+    return render(request, 'staff_groupdetail.html', {'group': group, 'is_owner': is_owner})
 
 
 @rattic_staff_required
 def groupedit(request, gid):
+    is_owner = request.user.has_perm("auth.is_owner_" + gid)
+    if not is_owner:
+        return render(request, 'staff_notallowed.html')
     group = get_object_or_404(Group, pk=gid)
-    logger.info(vars(group.permissions))
     if request.method == 'POST':
         form = GroupForm(request.POST, instance=group)
         if form.is_valid():
             form.save()
-	    for user in User.objects.all():
-		user.groups=user.groups.exclude(id=form.instance.id)
-	    for user in request.POST.getlist('users'):
-		User.objects.get(id=user).groups.add(form.instance)
+            group_id = form.instance.id
+            group_name = form.instance.name
+            permission_name = "auth.is_owner_" + str(group_id)
+            permission = permissions.get_or_set_owner_permission(group_id, group_name)
+            owners = form.data.getlist('owners')
+            for user in User.objects.all():
+                user.groups=user.groups.exclude(id=form.instance.id)
+            for user in request.POST.getlist('users'):
+                user_object = User.objects.get(id=user)
+                user_object.groups.add(form.instance)
+                if user_object.has_perm(permission_name) and str(user_object.id) not in owners:
+                    user_object.user_permissions.remove(permission)
+                    logger.info('No longer an owner: ' + str(user_object.id) + ' - ' + user_object.username)
+                elif not user_object.has_perm(permission_name) and str(user_object.id) in owners:
+                    user_object.user_permissions.add(permission)
+                    logger.info('New owner: ' + str(user_object.id) + ' - ' + user_object.username)
+                
             return HttpResponseRedirect(reverse('staff.views.home'))
         else:
-	    group = get_object_or_404(Group, pk=gid)
+            group = get_object_or_404(Group, pk=gid)
     else:
         form = GroupForm(instance=group)
 
@@ -107,6 +123,9 @@ def groupedit(request, gid):
 
 @rattic_staff_required
 def groupdelete(request, gid):
+    is_owner = request.user.has_perm("auth.is_owner_" + gid)
+    if not is_owner:
+        return render(request, 'staff_notallowed.html')
     group = get_object_or_404(Group, pk=gid)
     if request.method == 'POST':
         group.delete()
@@ -118,11 +137,11 @@ def groupdelete(request, gid):
 def userdelete(request, uid):
     user = get_object_or_404(User, pk=uid)
     if request.method == 'POST':
-	try:
-		group = Group.objects.get(id=user.self_group_id)
-		group.delete()
-	except:
-		pass
+        try:
+            group = Group.objects.get(id=user.self_group_id)
+            group.delete()
+        except:
+            pass
         user.delete()
         return HttpResponseRedirect(reverse('staff.views.home'))
     return render(request, 'staff_userdetail.html', {'viewuser': user, 'delete': True})
@@ -176,7 +195,7 @@ def audit(request, by, byarg):
 
 @rattic_staff_required
 def download(request):
-	return render(request, 'account_download_key.html', {})
+    return render(request, 'account_download_key.html', {})
 
 class NewUser(FormView):
     form_class = UserForm
@@ -190,17 +209,17 @@ class NewUser(FormView):
 
     # Create the user, set password to newpass
     def form_valid(self, form):
-	if form.cleaned_data['newpass'] is not None and len(form.cleaned_data['newpass']) > 0:
+        if form.cleaned_data['newpass'] is not None and len(form.cleaned_data['newpass']) > 0:
             user = form.save()
             user.set_password(form.cleaned_data['newpass'])
             user.save()
-	    group = Group(name="private_" + str(user), created=timezone.now())
-	    group.save()
+            group = Group(name="private_" + str(user), created=timezone.now())
+            group.save()
             user.self_group = group
             user.groups.add(group)
             user.save()
             return super(NewUser, self).form_valid(form)
-	return super(NewUser, self).form_invalid(form)
+        return super(NewUser, self).form_invalid(form)
 
 
 class UpdateUser(UpdateView):
@@ -220,12 +239,12 @@ class UpdateUser(UpdateView):
             form.instance.set_password(form.cleaned_data['newpass'])
         # If user is having groups removed we want change advice for those
         # groups
-	groups = []
-	for g in Group.objects.all():
-	    if g in form.cleaned_data['groups'] or g.id == form.instance.self_group_id:
-		groups.append(g)
-	form.cleaned_data['groups'] = groups
-	
+        groups = []
+        for g in Group.objects.all():
+            if g in form.cleaned_data['groups'] or g.id == form.instance.self_group_id:
+                groups.append(g)
+            form.cleaned_data['groups'] = groups
+    
         if form.instance.is_active and 'groups' in form.changed_data:
             # Get a list of the missing groups
             missing_groups = []
@@ -240,7 +259,7 @@ class UpdateUser(UpdateView):
         # If user is becoming inactive we want to redirect to change advice
         if 'is_active' in form.changed_data and not form.instance.is_active:
             self.success_url = reverse('cred.views.list', args=('changeadvice', form.instance.id))
-        return super(UpdateUser, self).form_valid(form)
+            return super(UpdateUser, self).form_valid(form)
 
 
 @rattic_staff_required

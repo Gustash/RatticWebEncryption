@@ -77,13 +77,29 @@ class GroupForm(forms.ModelForm):
             if not self.instance in u.groups.all():
                 users_in_group = users_in_group.exclude(id=u.id)
 
-        self.fields['users'] = forms.ModelMultipleChoiceField(label='Users', required=False, widget=SelectMultiple(attrs={'class': 'rattic-group-selector'}), queryset=User.objects.all(), initial=users_in_group)
+        self.fields['users'] = forms.ModelMultipleChoiceField(
+                label='Users', 
+                required=False, 
+                widget=SelectMultiple(attrs={'class': 'rattic-group-selector'}), 
+                queryset=User.objects.all(), 
+                initial=users_in_group
+        )
+
+        owners = None
+        if self.instance.id:
+            owners = users_in_group
+            for user in users_in_group:
+                if not user.has_perm("auth.is_owner_" + str(self.instance.id)):
+                    owners = owners.exclude(id=user.id)
 
         self.fields['owners'] = forms.ModelMultipleChoiceField(
             queryset=User.objects.all(),
             widget=forms.SelectMultiple(attrs={'class': 'rattic-group-selector'}),
             label = _('Owners')
         )
+        if owners:
+            logger.info(owners)
+            self.fields['owners'].initial = owners
 
     # Extend the Group model by adding a created column to save the date the Group was created at
     if not hasattr(Group, 'created'):

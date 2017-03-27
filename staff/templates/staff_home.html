@@ -47,10 +47,15 @@
   <tr><th>{% trans "Name" %}</th>{% if not USE_LDAP_GROUPS %}<th>{% trans "Edit" %}</th><th>{% trans "Delete" %}</th>{% endif %}</tr>
 {% for g in grouplist %}
 <tr>
-  <td><a href="{% url "staff.views.groupdetail" g.id %}">{{ g.name }}</a></td>
+  <td><a href="{% url "staff.views.groupdetail" g.group.id %}">{{ g.group.name }}</a></td>
   {% if not USE_LDAP_GROUPS %}
-    <td><a href="{% url "staff.views.groupedit" g.id %}">{% trans "Edit" %}</a></td>
-    <td><a href="{% url "staff.views.groupdelete" g.id %}">{% trans "Delete" %}</a></td>
+  {% if g.perm %}
+    <td><a href="{% url "staff.views.groupedit" g.group.id %}">{% trans "Edit" %}</a></td>
+    <td><a href="{% url "staff.views.groupdelete" g.group.id %}">{% trans "Delete" %}</a></td>
+  {% else %}
+    <td></td>
+    <td></td>
+  {% endif %}
   {% endif %}
 </tr>
 {% endfor %}

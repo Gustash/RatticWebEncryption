@@ -71,27 +71,24 @@ class UserForm(forms.ModelForm):
 
 class GroupForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        users = User.objects.all()
         super(GroupForm, self).__init__(*args, **kwargs)
-	users_in_group = users
-	for u in users:
-	    if not self.instance in u.groups.all():
-		users_in_group = users_in_group.exclude(id=u.id)
+        users_in_group = User.objects.all()
+        for u in User.objects.all():
+            if not self.instance in u.groups.all():
+                users_in_group = users_in_group.exclude(id=u.id)
 
-	self.fields['users'] = forms.ModelMultipleChoiceField(label='Users', required=False, widget=SelectMultiple(attrs={'class': 'rattic-group-selector'}), queryset=User.objects.all(), initial=users_in_group)
+        self.fields['users'] = forms.ModelMultipleChoiceField(label='Users', required=False, widget=SelectMultiple(attrs={'class': 'rattic-group-selector'}), queryset=User.objects.all(), initial=users_in_group)
 
-    # Extend the Group model by adding a created column to save the date the Group was created at
-    if not hasattr(Group, 'created'):
-        field = models.DateTimeField(Group, auto_now_add=True)
-        field.contribute_to_class(Group, 'created')
-
-    def __init__(self, *args, **kwargs):
-        super(GroupForm, self).__init__(*args, **kwargs)
         self.fields['owners'] = forms.ModelMultipleChoiceField(
             queryset=User.objects.all(),
             widget=forms.SelectMultiple(attrs={'class': 'rattic-group-selector'}),
             label = _('Owners')
         )
+
+    # Extend the Group model by adding a created column to save the date the Group was created at
+    if not hasattr(Group, 'created'):
+        field = models.DateTimeField(Group, auto_now_add=True)
+        field.contribute_to_class(Group, 'created')
 
     def clean_name(self):
         if (self.cleaned_data['name']):

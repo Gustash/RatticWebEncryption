@@ -27,11 +27,22 @@ import permissions
 
 logger = logging.getLogger(__name__)
 
+class perm_group():
+    group = None
+    perm = False
+    def __init__(self, group, perm):
+	self.group = group
+	self.perm = perm
+
 @rattic_staff_required
 def home(request):
     userlist = User.objects.all()
     grouplist = Group.objects.exclude(id__in=[user.self_group_id for user in User.objects.all()])
-    return render(request, 'staff_home.html', {'userlist': userlist, 'grouplist': grouplist})
+    perm_groups = []
+    for group in grouplist:
+    	perm_groups.append(perm_group(group, request.user.has_perm('auth.is_owner_' + str(group.id))))
+
+    return render(request, 'staff_home.html', {'userlist': userlist, 'grouplist': perm_groups})
 
 
 @rattic_staff_required
@@ -70,6 +81,7 @@ def groupadd(request):
         for user in User.objects.filter(id__in=owners):
             user.user_permissions.add(permission)
             user.save()
+	    logger.info(user.has_perm('auth.is_owner_' + str(form.instance.id)))
 #            request.user.groups.add(form.instance)
         return HttpResponseRedirect(reverse('staff.views.home'))
     else:

@@ -8,6 +8,7 @@ from cred.models import CredAudit
 #from datetime import datetime
 from django.db import models
 from django.utils import timezone
+from django.forms import SelectMultiple
 import logging
 
 logger = logging.getLogger(__name__)
@@ -69,6 +70,16 @@ class UserForm(forms.ModelForm):
         return cleaned_data
 
 class GroupForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        users = User.objects.all()
+        super(GroupForm, self).__init__(*args, **kwargs)
+	users_in_group = users
+	for u in users:
+	    if not self.instance in u.groups.all():
+		users_in_group = users_in_group.exclude(id=u.id)
+
+	self.fields['users'] = forms.ModelMultipleChoiceField(label='Users', required=False, widget=SelectMultiple(attrs={'class': 'rattic-group-selector'}), queryset=User.objects.all(), initial=users_in_group)
+
     # Extend the Group model by adding a created column to save the date the Group was created at
     if not hasattr(Group, 'created'):
     	field = models.DateTimeField(Group, auto_now_add=True)

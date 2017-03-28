@@ -13,6 +13,12 @@ urlpatterns = patterns('request.views',
         url(r'^list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/$', 'index', name='index'),
         url(r'^list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/page-(?P<page>\d+)/$', 'index', name='index'),
 
+        # List for group owners
+        url(r'^all/$', 'all', name='all'),
+        url(r'^all/list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/$', 'all', name='all'),
+        url(r'^all/list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/all/$', 'all', name='all'),
+        url(r'^all/list-by-(?P<cfilter>\w+)/(?P<value>[^/]*)/sort-(?P<sortdir>ascending|descending)-by-(?P<sort>\w+)/page-(?P<page>\d+)/all$', 'all', name='all'),
+
         # Search dialog for mobile
         url(r'^search/$', 'search'),
 )

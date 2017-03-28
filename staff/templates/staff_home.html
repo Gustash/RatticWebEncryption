@@ -17,14 +17,14 @@
   {% endif %}
   {# <a class="btn" href="{% url "staff.views.upload_keepass" %}">{% trans "Import Keepass" %}</a> #}
   <a class="btn" href="{% url "cred.views.list" 'special' 'trash' %}">{% trans "View Trash" %}</a>
-  <a class="btn" href="{% url "staff.views.audit" "days" 7 %}">{% trans "Audit One Week" %}</a>
+  {# <a class="btn" href="{% url "staff.views.audit" "days" 7 %}">{% trans "Audit One Week" %}</a> #}
 </div>
 
 <h2>{% trans "Users" %}</h2>
 <table class="table table-striped table-bordered table-condensed">
   <tr>
     <th>{% trans "Username" %}</th>
-    <th>{% trans "email" %}</th>
+    <th>{% trans "Email" %}</th>
     {% if not LDAP_ENABLED %}
     <th>{% trans "Edit" %}</th>
     <th>{% trans "Delete" %}</th>
@@ -53,8 +53,8 @@
     <td><a href="{% url "staff.views.groupedit" g.group.id %}">{% trans "Edit" %}</a></td>
     <td><a href="{% url "staff.views.groupdelete" g.group.id %}">{% trans "Delete" %}</a></td>
   {% else %}
-    <td></td>
-    <td></td>
+    <td>{% trans "Not an owner" %}</td>
+    <td>{% trans "Not an owner" %}</td>
   {% endif %}
   {% endif %}
 </tr>

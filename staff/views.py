@@ -10,6 +10,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
 from django_otp import user_has_device, devices_for_user
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db.models import Q
 
 import os
 import datetime
@@ -114,15 +115,21 @@ def groupedit(request, gid):
             owners = form.data.getlist('owners')
             for user in User.objects.all():
                 user.groups=user.groups.exclude(id=form.instance.id)
-            for user in request.POST.getlist('users'):
-                user_object = User.objects.get(id=user)
-                user_object.groups.add(form.instance)
-                if user_object.has_perm(permission_name) and str(user_object.id) not in owners:
-                    user_object.user_permissions.remove(permission)
-                    logger.info('No longer an owner: ' + str(user_object.id) + ' - ' + user_object.username)
-                elif not user_object.has_perm(permission_name) and str(user_object.id) in owners:
-                    user_object.user_permissions.add(permission)
-                    logger.info('New owner: ' + str(user_object.id) + ' - ' + user_object.username)
+            for user_id in request.POST.getlist('users'):
+                user = User.objects.get(id=user_id)
+                if not user.groups.filter(id=group_id):
+                    user.groups.add(form.instance)
+            for owner in User.objects.filter(Q(user_permissions=permission)).distinct():
+                if owner.has_perm(permission_name) and str(owner.id) not in owners:
+                    owner.user_permissions.remove(permission)
+                    logger.info('No longer an owner: ' + str(owner.id) + ' - ' + owner.username)
+            for owner_id in owners:
+                owner = User.objects.get(id=owner_id)
+                if not owner.groups.filter(id=group_id):
+                    owner.groups.add(group)
+                if not owner.has_perm(permission_name):
+                    owner.user_permissions.add(permission)
+                    logger.info('New owner: ' + str(owner.id) + ' - ' + owner.username)
                 
             return HttpResponseRedirect(reverse('staff.views.home'))
         else:

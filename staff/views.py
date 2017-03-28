@@ -74,12 +74,15 @@ def groupadd(request):
         if form.is_valid():
             form.save()
         for user in request.POST.getlist('users'):
-            User.objects.get(id=user).groups.add(form.instance)
+            user = User.objects.get(id=user)
+            user.groups.add(form.instance)
+            user.save()
             #request.user.groups.add(form.instance)
         owners = form.data.getlist('owners')
         permission = permissions.get_or_set_owner_permission(form.instance.id, form.instance.name)
         logger.info(permission)
         for user in User.objects.filter(id__in=owners):
+            user.groups.add(form.instance)
             user.user_permissions.add(permission)
             user.save()
 	    logger.info(user.has_perm('auth.is_owner_' + str(form.instance.id)))
@@ -119,6 +122,7 @@ def groupedit(request, gid):
                 user = User.objects.get(id=user_id)
                 if not user.groups.filter(id=group_id):
                     user.groups.add(form.instance)
+                    user.save()
             for owner in User.objects.filter(Q(user_permissions=permission)).distinct():
                 if owner.has_perm(permission_name) and str(owner.id) not in owners:
                     owner.user_permissions.remove(permission)
@@ -127,6 +131,7 @@ def groupedit(request, gid):
                 owner = User.objects.get(id=owner_id)
                 if not owner.groups.filter(id=group_id):
                     owner.groups.add(group)
+                    owner.save()
                 if not owner.has_perm(permission_name):
                     owner.user_permissions.add(permission)
                     logger.info('New owner: ' + str(owner.id) + ' - ' + owner.username)

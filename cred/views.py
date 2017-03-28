@@ -214,7 +214,7 @@ def detail(request, cred_id, cfilter='special', value='all', sortdir='descending
     if request.user.is_staff:
         credlogs = cred.logs.all()[:5]
         morelink = reverse('staff.views.audit', args=('cred', cred.id))
-        temp_creds = CredTemp.objects.search(request.user, cred, cfilter, value, sortdir, sort)
+        temp_creds = CredTemp.objects.search(request.user, False, cred, cfilter, value, sortdir, sort)
 
         # Apply the sorting rules
         if sortdir == 'ascending':
@@ -255,9 +255,9 @@ def detail(request, cred_id, cfilter='special', value='all', sortdir='descending
 
     # If there is a user with the group as self_group, it's a private password
     if not len(User.objects.filter(self_group_id=cred.group.id)) > 0:
-	mesh = AESCipher.mesh(str(cred.created), str(cred.group.created))
-	cipher = AESCipher(mesh)
-	cred.password = cipher.decrypt(cred.password)
+	    mesh = AESCipher.mesh(str(cred.created), str(cred.group.created))
+	    cipher = AESCipher(mesh)
+	    cred.password = cipher.decrypt(cred.password)
 
     state = dict()
     for s in State:

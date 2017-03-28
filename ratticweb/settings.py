@@ -173,7 +173,6 @@ INSTALLED_APPS = (
     'djcelery',
     'database_files',
     'social_auth',
-    'clear_cache',
 ) + LOCAL_APPS
 
 if os.environ.get("ENABLE_TESTS") == "1":

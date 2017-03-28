@@ -271,7 +271,7 @@ class UpdateUser(UpdateView):
         # If user is becoming inactive we want to redirect to change advice
         if 'is_active' in form.changed_data and not form.instance.is_active:
             self.success_url = reverse('cred.views.list', args=('changeadvice', form.instance.id))
-            return super(UpdateUser, self).form_valid(form)
+        return super(UpdateUser, self).form_valid(form)
 
 
 @rattic_staff_required

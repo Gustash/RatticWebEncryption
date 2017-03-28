@@ -71,7 +71,7 @@ class Message:
                 email_message = email.message_from_string(data[0][1])
                 if email_message.is_multipart():
                     if is_reply:
-                        return email_message.get_payload(0).get_payload().split('\n')[0].strip().lower()
+                        return self._get_html_text(email_message.get_payload(0).get_payload().lower()) 
                     else:
                         return email_message.get_payload(0).get_payload().split('\n')[2].strip().lower()
                 else:

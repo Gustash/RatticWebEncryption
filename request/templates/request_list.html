@@ -8,11 +8,7 @@
 
 <h1>{{ title }}</h1>
 
-{% if not user.is_staff %}
-  {% include "request_user_list.html" %}
-{% else %}
-  {% include "request_staff_list.html" %}
-{% endif %}
+{% include "request_user_list.html" %}
 
 <div class="pagination pagination-centered">
   <ul>

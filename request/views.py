@@ -12,6 +12,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib.auth.models import User
+from staff.decorators import rattic_staff_required
 
 import poplib
 import imaplib
@@ -28,7 +29,7 @@ class DataCred:
 @login_required
 def index(request, cfilter='special', value='all', sortdir='descending', sort='created', page=1):
     viewdict = {
-            'title': _('All requests'),
+            'title': _('My requests'),
             'alerts': [],
             'filter': unicode(cfilter).lower(),
             'value': unicode(value).lower(),
@@ -63,6 +64,45 @@ def index(request, cfilter='special', value='all', sortdir='descending', sort='c
     viewdict['data'] = temp_creds
     
     return render(request, 'request_list.html', viewdict)
+
+@rattic_staff_required
+def all(request, cfilter='special', value='all', sortdir='descending', sort='created', page=1):
+    viewdict = {
+            'title': _('Manage requests'),
+            'alerts': [],
+            'filter': unicode(cfilter).lower(),
+            'value': unicode(value).lower(),
+            'sort': unicode(sort).lower(),
+            'sortdir': unicode(sortdir).lower(),
+            'page': unicode(page).lower(),
+            'groups': request.user.groups,
+        }
+    
+    temp_creds = CredTemp.objects.search(request.user, owned=True, cfilter=cfilter, value=value, sortdir=sortdir, sort=sort)
+    
+    # Apply the sorting rules
+    if sortdir == 'ascending':
+            viewdict['revsortdir'] = 'descending'
+    elif sortdir == 'descending':
+            viewdict['revsortdir'] = 'ascending'
+    else:
+        raise Http404
+
+    if cfilter == 'search':
+            viewdict['title'] = _('Requests for search "%(searchstring)s"') % {'searchstring': value, }
+
+    # Get the page
+    paginator = Paginator(temp_creds, request.user.profile.items_per_page)
+    try:
+        temp_creds = paginator.page(page)
+    except PageNotAnInteger:
+        temp_creds = paginator.page(1)
+    except EmptyPage:
+        temp_creds = paginator.page(paginator.num_pages)
+
+    viewdict['data'] = temp_creds
+    
+    return render(request, 'request_all.html', viewdict)
 
 @login_required
 def add(request):

@@ -276,11 +276,16 @@ admin.site.register(Tag)
 admin.site.register(CredChangeQ, CredChangeQAdmin)
 
 class CredTempManager(models.Manager):
-    def search(self, user, cred=None, cfilter='special', value='all', sortdir='descending', sort='created'):
-        if not user.is_staff:
+    def search(self, user, cred=None, owned=False, cfilter='special', value='all', sortdir='descending', sort='created'):
+        if not user.is_staff or not owned:
             cred_temp_list = CredTemp.objects.filter(user=user)
         else:
-            cred_temp_list = CredTemp.objects.all()
+            owned = []
+            for group in user.groups.all():
+                permission_name = "auth.is_owner_{0}".format(group.id)
+                if user.has_perm(permission_name):
+                    owned.append(group.id)
+            cred_temp_list = CredTemp.objects.filter(cred__group__in=owned)
 #        search_object = None
 
         if cred:

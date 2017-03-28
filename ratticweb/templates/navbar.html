@@ -9,6 +9,7 @@
 {% url "staff.views.home" as staff_views_home %}
 {% url "help.views.home" as help_views_home %}
 {% url "request.views.index" as request_home %}
+{% url "request.views.all" as request_all %}
 <div class="navbar">
     <div class="navbar-inner">
         <a class="brand" href="{% url_root %}"><img class="logo" src="{% static rattic_icon %}" /><span class="hidden-phone"> {% trans "RatticDB" %}</span></a>
@@ -27,11 +28,16 @@
                 <a href="{{ staff_views_home }}">{% trans "Staff Management" %}</a>
               </li>
             {% endif %}
-            <li>
             {% if user.is_authenticated %}
-		<a href="{{ request_home }}">{% trans "Request Privilege" %}</a>
-	    {% endif %}
+            <li>
+		      <a href="{{ request_home }}">{% trans "My Requests" %}</a>
             </li>
+	        {% endif %}
+            {% if user.is_staff %}
+            <li>
+              <a href="{{ request_all }}">{% trans "Manage Requests" %}</a>
+            </li>
+            {% endif %}
             {% if helplinks %}
               <li {% if pageurl == help_views_home %}class="active"{% endif %}>
                 <a href="{{ help_views_home }}">{% trans "Help" %}</a>
@@ -62,8 +68,13 @@
                   </li>
                 {% endif %}
                 <li>
-                  <a href="{{ request_home }}">{% trans "Request Privilege" %}</a>
+                  <a href="{{ request_home }}">{% trans "My Requests" %}</a>
                 </li>
+                {% if user.is_staff %}
+                  <li>
+                    <a href="{{ request_all }}">{% trans "Manage Requests" %}</a>
+                  </li>
+                {% endif %}
                 <li>
                   <a href="{% url "account.views.logout_user" %}">{% trans "Logout" %}</a>
                 </li>

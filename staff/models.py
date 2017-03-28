@@ -72,34 +72,41 @@ class UserForm(forms.ModelForm):
 class GroupForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(GroupForm, self).__init__(*args, **kwargs)
+	#Get all users
         users_in_group = User.objects.all()
+	
+	#Foreach user, check if 'this' group is in his 'group' list
+	#if not, remove him from the 'user_in_group' list
         for u in User.objects.all():
             if not self.instance in u.groups.all():
                 users_in_group = users_in_group.exclude(id=u.id)
 
+	#Create a new field 'users' so that users can be added to the group when it is created or edited
         self.fields['users'] = forms.ModelMultipleChoiceField(
-                label='Users', 
-                required=False, 
-                widget=SelectMultiple(attrs={'class': 'rattic-group-selector'}), 
-                queryset=User.objects.all(), 
-                initial=users_in_group
+                label='Users', 		#Label for the 'input' is 'Users'
+                required=False, 	#It is not required
+                widget=SelectMultiple(attrs={'class': 'rattic-group-selector'}), 	#Set input of type 'SelectMultiple' so that multiple users can be added to the group
+                queryset=User.objects.all(), 	#Set the users that can be added (all users)
+                initial=users_in_group		#The initial value are those users who where already there
         )
-
+	
+	#Owners of the group are those who have permition to edit the group
         owners = None
+	#Check if the group has 'id' (if it does not have an 'id', it means that the group is being created, by this time, the group have no 'id')
         if self.instance.id:
-            owners = users_in_group
-            for user in users_in_group:
+	    #
+            owners = User.objects.all()
+            for user in User.objects.all():
                 if not user.has_perm("auth.is_owner_" + str(self.instance.id)):
                     owners = owners.exclude(id=user.id)
 
         self.fields['owners'] = forms.ModelMultipleChoiceField(
-            queryset=User.objects.all(),
+            queryset=User.objects.exclude(is_staff=False),
             widget=forms.SelectMultiple(attrs={'class': 'rattic-group-selector'}),
-            label = _('Owners')
+            label = _('Owners'),
+	    required = True,
+	    initial = owners
         )
-        if owners:
-            logger.info(owners)
-            self.fields['owners'].initial = owners
 
     # Extend the Group model by adding a created column to save the date the Group was created at
     if not hasattr(Group, 'created'):

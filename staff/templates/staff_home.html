@@ -15,7 +15,7 @@
   {% if not USE_LDAP_GROUPS %}
     <a class="btn" href="{% url "staff.views.groupadd" %}">{% trans "Add Group" %}</a>
   {% endif %}
-  <a class="btn" href="{% url "staff.views.upload_keepass" %}">{% trans "Import Keepass" %}</a>
+  {# <a class="btn" href="{% url "staff.views.upload_keepass" %}">{% trans "Import Keepass" %}</a> #}
   <a class="btn" href="{% url "cred.views.list" 'special' 'trash' %}">{% trans "View Trash" %}</a>
   <a class="btn" href="{% url "staff.views.audit" "days" 7 %}">{% trans "Audit One Week" %}</a>
 </div>

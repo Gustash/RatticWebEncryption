@@ -73,21 +73,21 @@ def groupadd(request):
         form = GroupForm(request.POST)
         if form.is_valid():
             form.save()
-        for user in request.POST.getlist('users'):
-            user = User.objects.get(id=user)
-            user.groups.add(form.instance)
-            user.save()
-            #request.user.groups.add(form.instance)
-        owners = form.data.getlist('owners')
-        permission = permissions.get_or_set_owner_permission(form.instance.id, form.instance.name)
-        logger.info(permission)
-        for user in User.objects.filter(id__in=owners):
-            user.groups.add(form.instance)
-            user.user_permissions.add(permission)
-            user.save()
-	    logger.info(user.has_perm('auth.is_owner_' + str(form.instance.id)))
-#            request.user.groups.add(form.instance)
-        return HttpResponseRedirect(reverse('staff.views.home'))
+            for user in request.POST.getlist('users'):
+                user = User.objects.get(id=user)
+                user.groups.add(form.instance)
+                user.save()
+                #request.user.groups.add(form.instance)
+            owners = form.data.getlist('owners')
+            permission = permissions.get_or_set_owner_permission(form.instance.id, form.instance.name)
+            logger.info(permission)
+            for user in User.objects.filter(id__in=owners):
+                user.groups.add(form.instance)
+                user.user_permissions.add(permission)
+                user.save()
+            logger.info(user.has_perm('auth.is_owner_' + str(form.instance.id)))
+    #            request.user.groups.add(form.instance)
+            return HttpResponseRedirect(reverse('staff.views.home'))
     else:
         form = GroupForm()
 

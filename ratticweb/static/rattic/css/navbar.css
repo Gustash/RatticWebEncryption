@@ -1,0 +1,39 @@
+/* navbar */
+.navbar-softinsa {
+    background-color: #00649d;
+    background-image: none;
+}
+/* Title */
+.navbar-softinsa .brand {
+    color: #ffffff;
+}
+/* Link */
+.navbar-softinsa .nav > li > a {
+    color: #ffffff;
+}
+.navbar-softinsa .nav > li > a:hover,
+.navbar-softinsa .nav > li > a:focus {
+    color: #ededed;
+}
+.navbar-softinsa .nav > .active > a,
+.navbar-softinsa .nav > .active > a:hover,
+.navbar-softinsa .nav > .active > a:focus {
+    color: #ffffff;
+    background-color: #00b0da;
+}
+.navbar-softinsa .nav li.dropdown.open > .dropdown-toggle,
+.navbar-softinsa .nav li.dropdown.active > .dropdown-toggle,
+.navbar-softinsa .nav li.dropdown.open.active > .dropdown-toggle {
+    color: #ffffff;
+    background-color: #00b0da;
+}
+/* Caret */
+.navbar-softinsa .nav li.dropdown > .dropdown-toggle .caret {
+    border-top-color: #ffffff;
+    border-bottom-color: #ffffff;
+}
+.navbar-softinsa .nav li.dropdown > .dropdown-toggle:hover .caret,
+.navbar-softinsa .nav li.dropdown > .dropdown-toggle:focus .caret {
+    border-top-color: #ffffff;
+    border-bottom-color: #ffffff;
+}

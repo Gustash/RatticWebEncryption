@@ -153,3 +153,18 @@ body {
 .table-striped > tbody > tr:nth-child(odd).temporary > td {
     background-color: #f4e842;
 }
+
+/*
+.navbar-softinsa {
+  background-color: #00b0da;
+  background-image: linear-gradient(to bottom, #00649d, #00b0da);
+}
+
+.navbar-softinsa .nav > li > a {
+  color: white;
+}
+
+.navbar .brand {
+  color: white;
+}
+*/

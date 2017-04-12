@@ -15,24 +15,21 @@
         <a class="brand" href="{% url_root %}"><img class="logo" src="{% static rattic_icon %}" /><span class="hidden-phone"> {% trans "RatticDB" %}</span></a>
 
         <ul class="nav visible-desktop">
+            {% if user.is_authenticated %}
             <li {% if pageurl == cred_views_list %}class="active"{% endif %}>
               <a href="{{ cred_views_list }}">{% trans "Passwords" %}</a>
             </li>
-            {% if user.is_authenticated %}
               <li {% if pageurl == cred_views_viewqueue %}class="active"{% endif %}>
                 <a href="{{ cred_views_viewqueue }}">{% trans "Change Queue" %}{% if changeqcount > 0 %} <span class="badge">{{ changeqcount }}</span>{% endif %}</a>
               </li>
-            {% endif %}
             {% if user.is_staff %}
               <li {% if pageurl == staff_views_home %}class="active"{% endif %}>
                 <a href="{{ staff_views_home }}">{% trans "Staff Management" %}</a>
               </li>
             {% endif %}
-            {% if user.is_authenticated %}
             <li {% if pageurl == request_home %}class="active"{% endif %}>
 		      <a href="{{ request_home }}">{% trans "My Requests" %}</a>
             </li>
-	        {% endif %}
             {% if user.is_staff %}
             <li {% if pageurl == request_all %}class="active"{% endif %}>
               <a href="{{ request_all }}">{% trans "Manage Requests" %}</a>
@@ -42,6 +39,7 @@
               <li {% if pageurl == help_views_home %}class="active"{% endif %}>
                 <a href="{{ help_views_home }}">{% trans "Help" %}</a>
               </li>
+            {% endif %}
             {% endif %}
         </ul>
 
@@ -101,6 +99,7 @@
           {% endif %}
         </ul>
 
+        {% if user.is_authenticated %}
         <form class="navbar-search pull-right hidden-phone rattic-cred-search">
 	     {% if appname == "request" %}
                  <input id="search-box" type="search" name="box" class="search-query" placeholder="{% trans "Search requests" %}">
@@ -108,5 +107,6 @@
                  <input id="search-box" type="search" name="box" class="search-query" placeholder="{% trans "Search passwords" %}">
 	     {% endif %}
         </form>
+        {% endif %}
     </div>
 </div>

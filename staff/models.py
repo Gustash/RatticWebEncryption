@@ -58,14 +58,13 @@ class UserForm(forms.ModelForm):
     def clean(self):
         # Check the passwords given match
         cleaned_data = super(UserForm, self).clean()
+        logger.info(cleaned_data)
         newpass = cleaned_data.get("newpass")
         confirmpass = cleaned_data.get("confirmpass")
 
         if newpass != confirmpass:
             msg = _('Passwords do not match')
             self._errors['confirmpass'] = self.error_class([msg])
-            del cleaned_data['newpass']
-            del cleaned_data['confirmpass']
 
         return cleaned_data
 

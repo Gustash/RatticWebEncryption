@@ -38,6 +38,10 @@
 </div>
 <p></p>
 {% endif %}
+{% if cred.is_latest and readonly %}
+    <a class="btn" href="{% url 'cred.views.addtoqueue' cred.id %}">{% trans "Add to Change Queue" %}</a>
+    <p></p>
+{% endif %}
 <table class="table table-striped table-bordered table-condensed">
 {% if cred.url %}<tr><th>{% trans "URL" %}</th><td><a href="{{ cred.url }}">{{ cred.url }}</a></td></tr>{% endif %}
 <tr>

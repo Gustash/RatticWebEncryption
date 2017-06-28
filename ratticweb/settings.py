@@ -212,7 +212,7 @@ LOGGING = {
 	'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/opt/RatticWeb-1.3.1/debug.log',
+            'filename': '/opt/apps/RatticWeb/debug.log',
         }
     },
     'loggers': {

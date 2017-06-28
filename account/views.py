@@ -138,7 +138,7 @@ def ldap_password_change(request,
 @login_required
 def logout_user(request):
 	logout(request)
-	response = HttpResponseRedirect('/')
+	response = HttpResponseRedirect(reverse('home'))
 	response.delete_cookie('rsa_key')
 	return response
 

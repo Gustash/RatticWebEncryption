@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: db_backup
+Version: 0.1.3
+Summary: Code for creating encrypted backups of databases
+Home-page: http://db-backup.readthedocs.org
+Author: Stephen Moore
+Author-email: stephen@delfick.com
+License: WTFPL
+Description: UNKNOWN
+Keywords: database encrypted backup restore
+Platform: UNKNOWN

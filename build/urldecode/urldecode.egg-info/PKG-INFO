@@ -1,0 +1,12 @@
+Metadata-Version: 1.1
+Name: urldecode
+Version: 0.1
+Summary: URLDecode is to decode an encoded url
+Home-page: http://github.com/jennyq/urldecode
+Author: Jenny Qian
+Author-email: guiqinqian@gmail.com
+License: GPL
+Download-URL: http://github.com/jennyq/urldecode/tarball/master
+Description: UNKNOWN
+Platform: Linux
+Platform: Windows

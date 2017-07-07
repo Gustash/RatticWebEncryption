@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load i18n %}
+{% load credicons %}
+
+{% block title %} Generate Key File {% endblock %}
+
+{% block content %}
+<h1>{% trans "Generate private key" %}</h1>
+<p>{% trans "In order for this new user to encrypt his private passwords, he'll need an RSA key. In layman's terms, that means he'll need a file that he can use to encrypt. Click the following button to generate a key for this user." %}</p>
+<h3 style="color: red;">{% trans "DO NOT LOSE THIS KEY OR ALL PASSWORDS ENCRYPTED BY IT WILL BE UNRECOVERABLE!" %}</h3>
+<p>{% trans "TL;DR: Generate a key for this new user. Give him the key. " %}<span style="color: red;">{% trans "Don't lose it, ever." %}</span></p>
+<div style="display: table; margin: 0 auto;">
+<a id="key_generator" style="margin-right: 10px;" class="btn btn-primary">{% trans "Generate Key" %}</a>
+<a class="btn btn-danger" href="{% url "staff.views.home" %}">{% trans "Back to Staff" %}</a>
+</div>
+{% endblock %}

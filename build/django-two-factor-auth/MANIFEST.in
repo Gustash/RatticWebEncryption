@@ -1,0 +1,5 @@
+include LICENSE.txt
+include README.rst
+prune two_factor/locale
+recursive-include two_factor/locale *
+recursive-include two_factor/templates *

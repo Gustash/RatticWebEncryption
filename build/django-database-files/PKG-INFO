@@ -1,0 +1,16 @@
+Metadata-Version: 1.0
+Name: django-database-files
+Version: 0.1
+Summary: A storage system for Django that stores uploaded files in the database.
+Home-page: https://github.com/bfirsh/django-database-files/
+Author: Ben Firshman
+Author-email: ben@firshman.co.uk
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
